@@ -14,7 +14,7 @@ branch, but release branches of Broker should not change.
   - [Setting up Go](#setting-up-go)
   - [Setting up Bazel](#setting-up-bazel)
   - [Setting up Docker](#setting-up-docker)
-  - [Setting up personal access token](#setting-up-token)
+  - [Setting up personal access token](#setting-up-personal-access-token)
 - [Git workflow](#git-workflow)
   - [Fork the main repository](#fork-the-main-repository)
   - [Clone your fork](#clone-your-fork)
