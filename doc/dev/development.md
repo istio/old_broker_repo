@@ -14,6 +14,7 @@ branch, but release branches of Broker should not change.
   - [Setting up Go](#setting-up-go)
   - [Setting up Bazel](#setting-up-bazel)
   - [Setting up Docker](#setting-up-docker)
+  - [Setting up personal access token](#setting-up-token)
 - [Git workflow](#git-workflow)
   - [Fork the main repository](#fork-the-main-repository)
   - [Clone your fork](#clone-your-fork)
@@ -73,6 +74,13 @@ installation procedures.
 To run some of Broker's examples and tests, you need to set up Docker server.
 Please follow [these instructions](https://docs.docker.com/engine/installation/)
 for how to do this for your platform.
+
+### Setting up personal access token
+
+Since Istio requires two-factor authentication, you must setup personal access
+token to enable push via HTTPS. Please follow [these
+instructions](https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/)
+for how to create a token.
 
 ## Git workflow
 
@@ -141,11 +149,18 @@ git remote set-url --push upstream no_push
 
 ### Committing changes to your fork
 
-When you're happy with some changes, you can commit them and push them to your fork:
+When you're happy with some changes, you can commit them to your fork:
 
 ```shell
 git add .
 git commit
+```
+Then push the change. When prompted for authentication, using your github
+username as usual but the personal access token as your password. Please follow
+[these instructions](https://help.github.com/articles/caching-your-github-password-in-git/#platform-linux)
+if you want to cache the token.
+
+```shell
 git push -f origin my-feature
 ```
 
