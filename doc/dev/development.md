@@ -19,6 +19,7 @@ branch, but release branches of Broker should not change.
   - [Fork the main repository](#fork-the-main-repository)
   - [Clone your fork](#clone-your-fork)
   - [Enable pre commit hook](#enable-pre-commit-hook)
+  - [Enable pre push hook](#enable-pre-push-hook)
   - [Create a branch and make changes](#create-a-branch-and-make-changes)
   - [Keeping your fork in sync](#keeping-your-fork-in-sync)
   - [Committing changes to your fork](#committing-changes-to-your-fork)
@@ -115,7 +116,7 @@ git config --global --add http.followRedirects 1
 ### Enable pre-commit hook
 
 Broker uses a local pre-commit hook to ensure that the code
-passes local test.
+is formatted.
 
 Run
 ```shell
@@ -124,6 +125,19 @@ Installing pre-commit hook
 ```
 This hook is invoked every time you commit changes locally.
 The commit is allowed to proceed only if the hook succeeds.
+
+### Enable pre-push hook
+
+Broker uses a local pre-push hook to ensure that the code
+passes local test.
+
+Run
+```shell
+user@host:~/GOHOME/src/istio.io/broker$ ./bin/pre-push
+Installing pre-push hook
+```
+This hook is invoked every time you push changes locally.
+The push is allowed to proceed only if the hook succeeds.
 
 ### Create a branch and make changes
 
@@ -149,15 +163,16 @@ git remote set-url --push upstream no_push
 
 ### Committing changes to your fork
 
-When you're happy with some changes, you can commit them to your fork:
+When you're happy with some changes, you can commit them to your repo:
 
 ```shell
 git add .
 git commit
 ```
-Then push the change. When prompted for authentication, using your github
-username as usual but the personal access token as your password. Please follow
-[these instructions](https://help.github.com/articles/caching-your-github-password-in-git/#platform-linux)
+Then push the change to the fork. When prompted for authentication, using your
+github username as usual but the personal access token as your password. Please
+follow [these
+instructions](https://help.github.com/articles/caching-your-github-password-in-git/#platform-linux)
 if you want to cache the token.
 
 ```shell
