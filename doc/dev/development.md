@@ -91,7 +91,7 @@ Other git workflows are also valid.
 
 1. Go to https://github.com/istio/broker
 2. Click the "Fork" button (at the top right)
-3. Follow the dialog to click your profile as the destination for the folk.
+3. Follow the dialog to click your profile as the destination for the fork.
 
 ### Clone your fork
 
