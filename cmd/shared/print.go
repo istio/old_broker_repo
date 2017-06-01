@@ -21,8 +21,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-
-	"istio.io/mixer/pkg/version"
+	"istio.io/broker/pkg/version"
 )
 
 // FormatFn formats the supplied arguments according to the format string
