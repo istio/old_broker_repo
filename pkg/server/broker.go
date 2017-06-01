@@ -16,24 +16,21 @@
 package server
 
 import (
-"os"
-"fmt"
-"net/http"
-"errors"
+	"fmt"
+	"net/http"
 
-"github.com/gorilla/mux"
+	"github.com/gorilla/mux"
 
-"github.com/golang/glog"
-"istio.io/broker/model"
-"istio.io/broker/controller"
+	"github.com/golang/glog"
+	"istio.io/broker/pkg/controller"
 )
 
 type Server struct {
-	controller *Controller
+	controller *controller.Controller
 }
 
 func CreateServer() (*Server, error) {
-	controller, err := CreateController()
+	controller, err := controller.CreateController()
 	if err != nil {
 		return nil, err
 	}
