@@ -40,7 +40,7 @@ func serverCmd(printf, fatalf shared.FormatFn) *cobra.Command {
 			runServer(sa, printf, fatalf)
 		},
 	}
-	serverCmd.PersistentFlags().Uint16VarP(&sa.port, "port", "p", 9091, "TCP port to use for Broker's Open Service Broker (OSB) API")
+	serverCmd.PersistentFlags().Uint16Var(&sa.port, "port", 9091, "TCP port to use for Broker's Open Service Broker (OSB) API")
 	serverCmd.PersistentFlags().Uint16Var(&sa.apiPort, "apiPort", 9093, "TCP port to use for Broker's gRPC API")
 	return &serverCmd
 }
@@ -51,9 +51,9 @@ func runServer(sa *serverArgs, printf, fatalf shared.FormatFn) {
 		fatalf("Failed to create server: %s", err.Error())
 	}
 
+	printf("Server started, listening on port %d", sa.port)
+	printf("CTL-C to break out of broker")
 	osb.Start(sa.port)
-	printf("Server started, listening on port %s", sa.port)
-	fmt.Println("CTL-C to break out of broker")
 }
 
 func getRootCmd(args []string) *cobra.Command {
