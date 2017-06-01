@@ -14,54 +14,34 @@
 package controller
 
 import (
-	"errors"
-	"fmt"
 	"net/http"
 
 	"github.com/golang/glog"
-	"istio.io/mixer/bazel-mixer/external/com_github_docker_distribution/registry/client"
-	"istio.io/mixer/bazel-mixer/external/com_github_prometheus_common/model"
+	"istio.io/broker/pkg/model"
+	"istio.io/broker/pkg/utils"
+)
+
+const (
+	demoCatalogFilePath = "example"
+	catalogFileName     = "demo_catalog.json"
 )
 
 type Controller struct {
 }
 
-func CreateController(cloudName string, instanceMap map[string]*model.ServiceInstance, bindingMap map[string]*model.ServiceBinding) (*Controller, error) {
+func CreateController() (*Controller, error) {
 	return new(Controller), nil
 }
 
 func (c *Controller) Catalog(w http.ResponseWriter, r *http.Request) {
 	glog.Infof("Get Service Broker Catalog...")
 	var catalog model.Catalog
-	catalogFileName := "dummy.catalog.json"
 
-	if c.cloudName == utils.AWS {
-		catalogFileName = "catalog.AWS.json"
-	} else if c.cloudName == utils.SOFTLAYER || c.cloudName == utils.SL {
-		catalogFileName = "catalog.SoftLayer.json"
-	}
-
-	err := utils.ReadAndUnmarshal(&catalog, conf.CatalogPath, catalogFileName)
+	err := utils.ReadAndUnmarshal(&catalog, demoCatalogFilePath, catalogFileName)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	utils.WriteResponse(w, http.StatusOK, catalog)
-}
-
-func readJson(object interface{}, dir string, fileName string) error {
-	path := dir + string(os.PathSeparator) + fileName
-
-	bytes, err := ReadFile(path)
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(bytes, object)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

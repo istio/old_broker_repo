@@ -14,20 +14,18 @@
 package main
 
 import (
-	"os"
-	"errors"
-	"fmt"
 	"flag"
+	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
-	"istio.io/broker/config"
-	"istio.io/broker/server"
 	"istio.io/broker/cmd/shared"
+	"istio.io/broker/pkg/server"
 )
 
 type serverArgs struct {
-	port                          uint16
-	apiPort                       uint16
+	port    uint16
+	apiPort uint16
 }
 
 func serverCmd(printf, fatalf shared.FormatFn) *cobra.Command {
