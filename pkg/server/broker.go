@@ -19,16 +19,18 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/golang/glog"
 	"github.com/gorilla/mux"
 
-	"github.com/golang/glog"
 	"istio.io/broker/pkg/controller"
 )
 
+// Server data
 type Server struct {
 	controller *controller.Controller
 }
 
+// CreateServer creates a broker server.
 func CreateServer() (*Server, error) {
 	controller, err := controller.CreateController()
 	if err != nil {
@@ -40,6 +42,7 @@ func CreateServer() (*Server, error) {
 	}, nil
 }
 
+// Start runs the server and listen on port.
 func (s *Server) Start(port uint16) {
 	router := mux.NewRouter()
 

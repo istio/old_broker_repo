@@ -11,11 +11,13 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package model
 
+// Service defines OSB service data structure.
 type Service struct {
 	Name           string   `json:"name"`
-	Id             string   `json:"id"`
+	ID             string   `json:"id"`
 	Description    string   `json:"description"`
 	Bindable       bool     `json:"bindable"`
 	PlanUpdateable bool     `json:"plan_updateable, omitempty"`

@@ -21,6 +21,7 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
+
 	"istio.io/broker/pkg/version"
 )
 

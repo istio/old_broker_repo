@@ -11,14 +11,17 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+// Package controller contains the actual processing of frontend requests.
 package controller
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/golang/glog"
 	"istio.io/broker/pkg/model"
-	"istio.io/broker/pkg/utils"
 )
 
 const (
@@ -26,22 +29,39 @@ const (
 	catalogFileName     = "demo_catalog.json"
 )
 
+// Controller data
 type Controller struct {
 }
 
+// CreateController creates a new controller instance.
 func CreateController() (*Controller, error) {
 	return new(Controller), nil
 }
 
+// Catalog serves catalog request and generate response.
 func (c *Controller) Catalog(w http.ResponseWriter, r *http.Request) {
 	glog.Infof("Get Service Broker Catalog...")
 	var catalog model.Catalog
 
-	err := utils.ReadAndUnmarshal(&catalog, demoCatalogFilePath, catalogFileName)
+	if err := readAndUnmarshal(&catalog, demoCatalogFilePath, catalogFileName); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+	} else {
+		writeResponse(w, http.StatusOK, catalog)
+	}
+}
+
+func writeResponse(w http.ResponseWriter, code int, object interface{}) {
+	data, err := json.Marshal(object)
 	if err != nil {
+		glog.Errorf("Marsal response data object error %s", err.Error())
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	utils.WriteResponse(w, http.StatusOK, catalog)
+	w.WriteHeader(code)
+	if _, err = fmt.Fprintf(w, string(data)); err != nil {
+		glog.Errorf("Write response data error %s", err.Error())
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 }

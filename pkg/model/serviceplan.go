@@ -14,7 +14,11 @@
 
 package model
 
-// Catalog defines OSB catalog request data structure.
-type Catalog struct {
-	Services []Service `json:"services"`
+// ServicePlan defines the OSB service plan data structure.
+type ServicePlan struct {
+	Name        string      `json:"name"`
+	ID          string      `json:"id"`
+	Description string      `json:"description"`
+	Metadata    interface{} `json:"metadata, omitempty"`
+	Free        bool        `json:"free, omitempty"`
 }

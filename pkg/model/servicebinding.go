@@ -11,22 +11,26 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package model
 
+// ServiceBinding defines OSB service binding data structure.
 type ServiceBinding struct {
-	Id                string `json:"id"`
-	ServiceId         string `json:"service_id"`
-	AppId             string `json:"app_id"`
-	ServicePlanId     string `json:"service_plan_id"`
+	ID                string `json:"id"`
+	ServiceID         string `json:"service_id"`
+	AppID             string `json:"app_id"`
+	ServicePlanID     string `json:"service_plan_id"`
 	PrivateKey        string `json:"private_key"`
-	ServiceInstanceId string `json:"service_instance_id"`
+	ServiceInstanceID string `json:"service_instance_id"`
 }
 
+// CreateServiceBindingResponse defines OSB service binding response data structure.
 type CreateServiceBindingResponse struct {
 	// SyslogDrainUrl string      `json:"syslog_drain_url, omitempty"`
 	Credentials interface{} `json:"credentials"`
 }
 
+// Credential defines OSB credential data structure.
 type Credential struct {
 	PublicIP   string `json:"public_ip"`
 	UserName   string `json:"username"`

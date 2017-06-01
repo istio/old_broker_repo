@@ -11,29 +11,33 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 package model
 
+// ServiceInstance defines OSB service instance data structure.
 type ServiceInstance struct {
-	Id               string `json:"id"`
-	DashboardUrl     string `json:"dashboard_url"`
-	InternalId       string `json:"internalId, omitempty"`
-	ServiceId        string `json:"service_id"`
-	PlanId           string `json:"plan_id"`
-	OrganizationGuid string `json:"organization_guid"`
-	SpaceGuid        string `json:"space_guid"`
+	ID               string `json:"id"`
+	DashboardURL     string `json:"dashboard_url"`
+	InternalID       string `json:"internalId, omitempty"`
+	ServiceID        string `json:"service_id"`
+	PlanID           string `json:"plan_id"`
+	OrganizationGUID string `json:"organization_guid"`
+	SpaceGUID        string `json:"space_guid"`
 
 	LastOperation *LastOperation `json:"last_operation, omitempty"`
 
 	Parameters interface{} `json:"parameters, omitempty"`
 }
 
+// LastOperation defines OSB last operation data structure.
 type LastOperation struct {
 	State                    string `json:"state"`
 	Description              string `json:"description"`
 	AsyncPollIntervalSeconds int    `json:"async_poll_interval_seconds, omitempty"`
 }
 
+// CreateServiceInstanceResponse defines OSB service instance response data structure.
 type CreateServiceInstanceResponse struct {
-	DashboardUrl  string         `json:"dashboard_url"`
+	DashboardURL  string         `json:"dashboard_url"`
 	LastOperation *LastOperation `json:"last_operation, omitempty"`
 }

@@ -11,44 +11,31 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package utils
+
+package controller
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
-	"net/http"
 	"os"
 )
 
-func ReadAndUnmarshal(object interface{}, dir string, fileName string) error {
+func readAndUnmarshal(object interface{}, dir string, fileName string) error {
 	path := dir + string(os.PathSeparator) + fileName
 
-	bytes, err := ReadFile(path)
+	bytes, err := readFile(path)
 	if err != nil {
 		return err
 	}
 
-	err = json.Unmarshal(bytes, object)
-	if err != nil {
+	if err = json.Unmarshal(bytes, object); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func WriteResponse(w http.ResponseWriter, code int, object interface{}) {
-	data, err := json.Marshal(object)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(code)
-	fmt.Fprintf(w, string(data))
-}
-
-func ReadFile(path string) (content []byte, err error) {
+func readFile(path string) (content []byte, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		return
