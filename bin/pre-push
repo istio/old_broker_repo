@@ -29,5 +29,5 @@ if ! [[ -f WORKSPACE ]]; then
 fi
 
 bazel test //...
-# bin/racetest.sh
+bin/racetest.sh
 bin/linters.sh

@@ -7,8 +7,8 @@ go_library(
     srcs = [
         "catalog.go",
         "service.go",
-        "servicebinding.go",
-        "serviceinstance.go",
-        "serviceplan.go",
+        "serviceBinding.go",
+        "serviceInstance.go",
+        "servicePlan.go",
     ],
 )

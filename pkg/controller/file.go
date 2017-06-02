@@ -23,7 +23,7 @@ import (
 func readAndUnmarshal(object interface{}, dir string, fileName string) error {
 	path := dir + string(os.PathSeparator) + fileName
 
-	bytes, err := readFile(path)
+	bytes, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
@@ -33,20 +33,4 @@ func readAndUnmarshal(object interface{}, dir string, fileName string) error {
 	}
 
 	return nil
-}
-
-func readFile(path string) (content []byte, err error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return
-	}
-	defer file.Close()
-
-	bytes, err := ioutil.ReadAll(file)
-	if err != nil {
-		return
-	}
-	content = bytes
-
-	return
 }

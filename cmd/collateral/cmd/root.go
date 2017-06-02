@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This is a simple command that is used to output the auto-generated collateral
-// files for the various broker CLI commands. More specifically, this outputs
-// markdown files and man pages that describe the CLI commands, along with
-// bash completion files.
-
+// Package cmd provides a simple command to be used to output the auto-generated
+// collateral files for the various broker CLI commands. More specifically, this
+// outputs markdown files and man pages that describe the CLI commands, along
+// with bash completion files.
 package cmd
 
 import (
@@ -35,7 +34,7 @@ func GetRootCmd(args []string, printf, fatalf shared.FormatFn) *cobra.Command {
 
 	rootCmd := &cobra.Command{
 		Use:   "brkcol",
-		Short: "Generate collateral for mixer CLI commands",
+		Short: "Generate collateral for Broker CLI commands",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
 				return fmt.Errorf("'%s' is an invalid argument", args[0])
@@ -56,12 +55,12 @@ func work(printf, fatalf shared.FormatFn, outputDir string) {
 		brks.GetRootCmd(nil),
 	}
 
-	printf("Outputting Mixer CLI collateral files to %s", outputDir)
+	printf("Outputting Broker CLI collateral files to %s", outputDir)
 	for _, r := range roots {
 		hdr := doc.GenManHeader{
-			Title:   "Istio Mixer",
-			Section: "Mixer CLI",
-			Manual:  "Istio Mixer",
+			Title:   "Istio Broker",
+			Section: "Broker CLI",
+			Manual:  "Istio Broker",
 		}
 
 		if err := doc.GenManTree(r, &hdr, outputDir); err != nil {

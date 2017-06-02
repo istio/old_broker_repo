@@ -26,7 +26,7 @@ import (
 // GetRootCmd generates the root command for broker server.
 func GetRootCmd(args []string) *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "brokers",
+		Use:   "brks",
 		Short: "The Istio broker provides open service broker functionality to the Istio services and external marketplaces",
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 0 {
