@@ -10,12 +10,6 @@ load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "new_go_repository")
 
 go_repositories()
 
-git_repository(
-    name = "org_pubref_rules_protobuf",
-    commit = "9ede1dbc38f0b89ae6cd8e206a22dd93cc1d5637",  # Mar 31 2017 (gogo* support)
-    remote = "https://github.com/geeknoid/rules_protobuf",
-)
-
 load("@org_pubref_rules_protobuf//protobuf:rules.bzl", "proto_repositories")
 
 proto_repositories()
@@ -43,12 +37,6 @@ new_go_repository(
     name = "com_github_ghodss_yaml",
     commit = "04f313413ffd65ce25f2541bfd2b2ceec5c0908c",  # Dec 6, 2016 (no releases)
     importpath = "github.com/ghodss/yaml",
-)
-
-new_go_repository(
-    name = "com_github_geeknoid_gogo_protobuf",
-    commit = "210910de191e1cdc05d0b6881c575d9a77e2526f",  # May 1, 2017 (no releases)
-    importpath = "github.com/geeknoid/protobuf",
 )
 
 new_go_repository(
