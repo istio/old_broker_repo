@@ -1,4 +1,4 @@
-workspace(name = "com_github_istio_mixer")
+workspace(name = "com_github_istio_broker")
 
 git_repository(
     name = "io_bazel_rules_go",
