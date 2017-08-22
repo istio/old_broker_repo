@@ -2,9 +2,12 @@ workspace(name = "com_github_istio_broker")
 
 git_repository(
     name = "io_bazel_rules_go",
-    commit = "7991b6353e468ba5e8403af382241d9ce031e571",  # Aug 1, 2017 (gazelle fixes)
     remote = "https://github.com/bazelbuild/rules_go.git",
+    tag = "0.5.3",
 )
+load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "go_repository")
+
+go_repositories()
 
 git_repository(
     name = "io_bazel_rules_docker",
@@ -13,10 +16,6 @@ git_repository(
 )
 load("@io_bazel_rules_docker//docker:docker.bzl", "docker_repositories")
 docker_repositories()
-
-load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "go_repository")
-
-go_repositories()
 
 git_repository(
     name = "org_pubref_rules_protobuf",
