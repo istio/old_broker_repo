@@ -3,11 +3,12 @@ kind: ServiceClass
 metadata:
   name: productpage-service-class
 spec:
-  service: productpage
-  id: 0001
-  name: istio-bookinfo-productpage
-  description: A book info service
-  bindable: True
+  deployment:
+    name: productpage
+  catalog: 
+    name: istio-bookinfo-productpage
+    id: 0001
+    description: A book info service
   plans:
     - monthly-service-plan
     - yearly-service-plan
@@ -17,15 +18,17 @@ kind: ServicePlan
 metadata:
   name: monthly-service-plan
 spec:
-  name: istio-monthly
-  id: 0001
-  description: monthly subscription
+  plan:
+    name: istio-monthly
+    id: 0001
+    description: monthly subscription
 ---
 apiVersion: "config.istio.io/v1alpha2"
 kind: ServicePlan
 metadata:
   name: yearly-service-plan
 spec:
-  name: istio-yearly
-  id: 0001
-  description: yearly subscription
+  plan: 
+    name: istio-yearly
+    id: 0001
+    description: yearly subscription
