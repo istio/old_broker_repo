@@ -41,12 +41,6 @@ done
 IFS=',' read -ra TAGS <<< "${TAGS}"
 IFS=',' read -ra HUBS <<< "${HUBS}"
 
-# Building grafana image
-pushd "${ROOT}/deploy/kube/conf"
-docker build . -t grafana
-IMAGES+=(grafana)
-popd
-
 # Build Bazel based docker images
 for IMAGE in "${BAZEL_IMAGES[@]}"; do
   bazel ${BAZEL_STARTUP_ARGS} run ${BAZEL_ARGS} "//docker:${IMAGE}"
