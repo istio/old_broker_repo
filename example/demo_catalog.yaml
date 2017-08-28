@@ -1,11 +1,11 @@
-apiVersion: "config.istio.io/v1alpha2"
+apiVersion: "config.istio.io/v1"
 kind: ServiceClass
 metadata:
   name: productpage-service-class
 spec:
   deployment:
-    name: productpage
-  catalog: 
+    instance: productpage
+  entry:
     name: istio-bookinfo-productpage
     id: 0001
     description: A book info service
@@ -13,7 +13,7 @@ spec:
     - monthly-service-plan
     - yearly-service-plan
 ---
-apiVersion: "config.istio.io/v1alpha2"
+apiVersion: "config.istio.io/v1"
 kind: ServicePlan
 metadata:
   name: monthly-service-plan
@@ -23,7 +23,7 @@ spec:
     id: 0001
     description: monthly subscription
 ---
-apiVersion: "config.istio.io/v1alpha2"
+apiVersion: "config.istio.io/v1"
 kind: ServicePlan
 metadata:
   name: yearly-service-plan
