@@ -23,14 +23,6 @@ git_repository(
     remote = "https://github.com/pubref/rules_protobuf",
 )
 
-load("@org_pubref_rules_protobuf//gogo:rules.bzl", "gogo_proto_repositories")
-
-gogo_proto_repositories()
-
-load("@org_pubref_rules_protobuf//cpp:rules.bzl", "cpp_proto_repositories")
-
-cpp_proto_repositories()
-
 go_repository(
     name = "com_github_golang_glog",
     commit = "23def4e6c14b4da8ac2ed8007337bc5eb5007998",  # Jan 26, 2016 (no releases)
