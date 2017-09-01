@@ -12,13 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+syntax = "proto3";
 
-// ServicePlan defines the OSB service plan data structure.
-type ServicePlan struct {
-	Name        string      `json:"name"`
-	ID          string      `json:"id"`
-	Description string      `json:"description"`
-	Metadata    interface{} `json:"metadata, omitempty"`
-	Free        bool        `json:"free, omitempty"`
+// Basic config resource consisting
+// of a set of key-value pairs
+
+package test;
+
+message MockConfig {
+  string key = 1;
+  repeated ConfigPair pairs = 2;
+}
+
+message ConfigPair {
+  string key = 1;
+  string value = 2;
 }

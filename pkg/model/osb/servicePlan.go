@@ -12,19 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package model
+package osb
 
-// Service defines OSB service data structure.
-type Service struct {
-	Name           string   `json:"name"`
-	ID             string   `json:"id"`
-	Description    string   `json:"description"`
-	Bindable       bool     `json:"bindable"`
-	PlanUpdateable bool     `json:"plan_updateable, omitempty"`
-	Tags           []string `json:"tags, omitempty"`
-	Requires       []string `json:"requires, omitempty"`
-
-	Metadata        interface{}   `json:"metadata, omitempty"`
-	Plans           []ServicePlan `json:"plans"`
-	DashboardClient interface{}   `json:"dashboard_client"`
+// ServicePlan defines the OSB service plan data structure.
+type ServicePlan struct {
+	Name        string      `json:"name"`
+	ID          string      `json:"id"`
+	Description string      `json:"description"`
+	Metadata    interface{} `json:"metadata, omitempty"`
+	Free        bool        `json:"free, omitempty"`
 }
