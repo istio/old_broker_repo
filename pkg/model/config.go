@@ -15,13 +15,13 @@
 package model
 
 import (
+	brokerconfig "broker/v1/config"
 	"errors"
 	"fmt"
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 
-	brokerconfig "istio.io/api/broker/v1/config"
 	"istio.io/broker/model/test"
 )
 

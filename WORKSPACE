@@ -2,9 +2,10 @@ workspace(name = "com_github_istio_broker")
 
 git_repository(
     name = "io_bazel_rules_go",
+    commit = "eba68677493422112dd25f6a0b4bbdb02387e5a4",  # Aug 1, 2017
     remote = "https://github.com/bazelbuild/rules_go.git",
-    tag = "0.5.3",
 )
+
 load("@io_bazel_rules_go//go:def.bzl", "go_repositories", "go_repository")
 
 go_repositories()
