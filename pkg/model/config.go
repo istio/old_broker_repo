@@ -22,7 +22,7 @@ import (
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 
-	"istio.io/broker/model/test"
+	"istio.io/broker/pkg/model/test"
 )
 
 // ConfigMeta is metadata attached to each configuration unit.

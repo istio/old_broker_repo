@@ -24,10 +24,33 @@ git_repository(
     remote = "https://github.com/pubref/rules_protobuf",
 )
 
+git_repository(
+    name = "com_github_google_protobuf",
+    commit = "52ab3b07ac9a6889ed0ac9bf21afd8dab8ef0014",  # Oct 4, 2016 (match pubref dep)
+    remote = "https://github.com/google/protobuf.git",
+)
+
+bind(
+    name = "protoc",
+    actual = "@com_github_google_protobuf//:protoc",
+)
+
+go_repository(
+    name = "com_github_gogo_protobuf",
+    commit = "100ba4e885062801d56799d78530b73b178a78f3",  # Mar 7, 2017 (match pubref dep)
+    importpath = "github.com/gogo/protobuf",
+)
+
 go_repository(
     name = "com_github_golang_glog",
     commit = "23def4e6c14b4da8ac2ed8007337bc5eb5007998",  # Jan 26, 2016 (no releases)
     importpath = "github.com/golang/glog",
+)
+
+go_repository(
+    name = "org_golang_x_net",
+    commit = "f5079bd7f6f74e23c4d65efa0f4ce14cbd6a3c0f",  # Jul 26, 2017 (no releases)
+    importpath = "golang.org/x/net",
 )
 
 go_repository(

@@ -1,14 +1,24 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@org_pubref_rules_protobuf//gogo:rules.bzl", "gogoslick_proto_library")
 
-go_library(
+gogoslick_proto_library(
     name = "go_default_library",
-    srcs = ["mock_config.pb.go"],
-    visibility = ["//visibility:public"],
-    deps = ["@com_github_golang_protobuf//proto:go_default_library"],
-)
-
-filegroup(
-    name = "go_default_library_protos",
-    srcs = ["mock_config.proto"],
-    visibility = ["//visibility:public"],
+    importmap = {
+        "gogoproto/gogo.proto": "github.com/gogo/protobuf/gogoproto",
+    },
+    imports = [
+        "external/com_github_gogo_protobuf",
+        "external/com_github_google_protobuf/src",
+    ],
+    inputs = [
+        "@com_github_google_protobuf//:well_known_protos",
+        "@com_github_gogo_protobuf//gogoproto:go_default_library_protos",
+    ],
+    protos = [
+        "mock_config.proto",
+    ],
+    verbose = 0,
+    visibility = ["//pkg/model:__pkg__"],
+    deps = [
+        "@com_github_gogo_protobuf//gogoproto:go_default_library",
+    ],
 )

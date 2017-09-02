@@ -17,7 +17,14 @@ syntax = "proto3";
 // Basic config resource consisting
 // of a set of key-value pairs
 
-package test;
+package pkg.model.test;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "test";
+option (gogoproto.goproto_getters_all) = false;
+option (gogoproto.equal_all) = false;
+option (gogoproto.gostring_all) = false;
 
 message MockConfig {
   string key = 1;

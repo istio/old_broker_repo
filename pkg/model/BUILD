@@ -6,7 +6,7 @@ go_library(
     name = "go_default_library",
     srcs = ["config.go"],
     deps = [
-        "//model/test:go_default_library",
+        "//pkg/model/test:go_default_library",
         "@com_github_golang_glog//:go_default_library",
         "@com_github_golang_protobuf//proto:go_default_library",
     ],
