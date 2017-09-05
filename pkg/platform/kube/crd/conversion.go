@@ -20,7 +20,7 @@ import (
 
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"istio.io/pilot/model"
+	"istio.io/broker/pkg/model"
 )
 
 func convertObject(schema model.ProtoSchema, object IstioObject) (*model.Config, error) {

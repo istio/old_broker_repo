@@ -216,7 +216,7 @@ go_repository(
 load("//:repositories.bzl", "new_git_or_local_repository")
 
 new_git_or_local_repository(
-    name = "com_github_istio_api",
+    name = "io_istio_api",
     build_file = "BUILD.api",
     commit = "c0bca9d735e67eac110621b088d66de04f326b90",  # Aug 31, 2017 (no releases)
     path = "../api",
@@ -421,7 +421,7 @@ go_repository(
 
 go_repository(
     name = "com_github_juju_ratelimit",
-    commit = "acf38b000a03e4ab89e40f20f1e548f4e6ac7f72",  # Mar 13, 2017 (no releases)
+    commit = "5b9ff866471762aa2ab2dced63c9fb6f53921342",  # May 22, 2017 (no releases)
     importpath = "github.com/juju/ratelimit",
 )
 

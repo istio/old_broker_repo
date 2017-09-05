@@ -15,13 +15,13 @@
 package model
 
 import (
-	brokerconfig "istio.io/api/broker/v1/config"
 	"errors"
 	"fmt"
 
 	"github.com/golang/glog"
 	"github.com/golang/protobuf/proto"
 
+	brokerconfig "istio.io/api/broker/v1/config"
 	"istio.io/broker/pkg/model/test"
 )
 
@@ -145,22 +145,6 @@ func (config *Config) Key() string {
 // ConfigDescriptor defines the bijection between the short type name and its
 // fully qualified protobuf message name
 type ConfigDescriptor []ProtoSchema
-
-// ProtoSchema provides description of the configuration schema and its key function
-type ProtoSchema struct {
-	// Type refers to the short configuration type name
-	Type string
-
-	// Plural refers to the short plural configuration name
-	Plural string
-
-	// MessageName refers to the protobuf message type name corresponding to the type
-	MessageName string
-
-	// Validate configuration as a protobuf message assuming the object is an
-	// instance of the expected message type
-	Validate func(config proto.Message) error
-}
 
 // Types lists all known types in the config schema
 func (descriptor ConfigDescriptor) Types() []string {

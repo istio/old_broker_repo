@@ -4,11 +4,18 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "go_default_library",
-    srcs = ["config.go"],
+    srcs = [
+        "config.go",
+        "protoschema.go",
+    ],
     deps = [
         "//pkg/model/test:go_default_library",
+        "@com_github_ghodss_yaml//:go_default_library",
         "@com_github_golang_glog//:go_default_library",
+        "@com_github_golang_protobuf//jsonpb:go_default_library",
         "@com_github_golang_protobuf//proto:go_default_library",
-        "@com_github_istio_api//:broker/v1/config"
+        "@com_github_hashicorp_go_multierror//:go_default_library",
+        "@in_gopkg_yaml_v2//:go_default_library",
+        "@io_istio_api//:broker/v1/config",
     ],
 )

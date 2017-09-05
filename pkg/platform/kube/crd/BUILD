@@ -6,6 +6,7 @@ go_library(
         "client.go",
         "conversion.go",
         "template.go",
+        "types.go",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -25,4 +26,12 @@ go_library(
         "@io_k8s_client_go//rest:go_default_library",
         "@io_k8s_client_go//tools/clientcmd:go_default_library",
     ],
+)
+
+genrule(
+    name = "crd",
+    srcs = ["template.go"],
+    outs = ["types.go"],
+    cmd = "pkg/platform/kube/crd/generate.sh > $@",
+    tools = ["generate.sh"],
 )
