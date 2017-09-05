@@ -4,17 +4,11 @@ package(default_visibility = ["//visibility:public"])
 
 load("@io_bazel_rules_go//go:def.bzl", "go_prefix")
 
-go_prefix("istio.io/api")
+go_prefix("istio.io/api/broker/v1/config")
 
-load("@org_pubref_rules_protobuf//gogo:rules.bzl", "gogoslick_proto_library")
+load("@io_bazel_rules_go//proto:go_proto_library.bzl", "go_proto_library")
 
-gogoslick_proto_library(
-    name = "broker/v1/config",
-    protos = [
-        "broker/v1/config/service_class.proto",
-        "broker/v1/config/service_plan.proto",
-    ],
-    verbose = 0,
-    visibility = ["//visibility:public"],
-    with_grpc = False,
+go_proto_library(
+    name = "go_default_library",
+    srcs = glob(["broker/v1/config/*.proto"]),
 )
