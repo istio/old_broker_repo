@@ -9,5 +9,6 @@ go_library(
         "//pkg/model/test:go_default_library",
         "@com_github_golang_glog//:go_default_library",
         "@com_github_golang_protobuf//proto:go_default_library",
+        "@com_github_istio_api//:broker/v1/config"
     ],
 )

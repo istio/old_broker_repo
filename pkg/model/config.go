@@ -15,7 +15,7 @@
 package model
 
 import (
-	brokerconfig "broker/v1/config"
+	brokerconfig "istio.io/api/broker/v1/config"
 	"errors"
 	"fmt"
 

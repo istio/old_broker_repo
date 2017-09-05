@@ -218,7 +218,7 @@ load("//:repositories.bzl", "new_git_or_local_repository")
 new_git_or_local_repository(
     name = "com_github_istio_api",
     build_file = "BUILD.api",
-    commit = "7d82318c70c7ba8611eed585ac1a8da44a005adb",  # May 1, 2017 (no releases)
+    commit = "c0bca9d735e67eac110621b088d66de04f326b90",  # Aug 31, 2017 (no releases)
     path = "../api",
     remote = "https://github.com/istio/api.git",
     # Change this to True to use ../api directory
@@ -304,8 +304,18 @@ go_repository(
 )
 
 go_repository(
+    name = "io_k8s_api",
+    build_file_generation = "on",
+    build_file_name = "BUILD.bazel",
+    commit = "4d5cc6efc5e84aa19fb1bd3f911c16a6723c1bb7",
+    importpath = "k8s.io/api",
+)
+
+go_repository(
     name = "io_k8s_client_go",
-    commit = "243d8a9cb66a51ad8676157f79e71033b4014a2a",  # Dec 11, 2016 (matches istio manager)
+    build_file_generation = "on",
+    build_file_name = "BUILD.bazel",
+    commit = "7c69e980210777a6292351ac6873de083526f08e",  # Jul 18, 2017
     importpath = "k8s.io/client-go",
 )
 
@@ -323,6 +333,24 @@ go_repository(
     build_file_name = "BUILD.bazel",
     commit = "c682349b0d1c12975d8e24a9799b66747255d7a5",
     importpath = "k8s.io/apiextensions-apiserver",
+)
+
+go_repository(
+    name = "com_github_googleapis_gnostic",
+    commit = "68f4ded48ba9414dab2ae69b3f0d69971da73aa5",
+    importpath = "github.com/googleapis/gnostic",
+)
+
+go_repository(
+    name = "com_github_emicklei_go_restful",
+    commit = "ff4f55a206334ef123e4f79bbf348980da81ca46",
+    importpath = "github.com/emicklei/go-restful",
+)
+
+go_repository(
+    name = "com_github_emicklei_go_restful_swagger12",
+    commit = "dcef7f55730566d41eae5db10e7d6981829720f6",
+    importpath = "github.com/emicklei/go-restful-swagger12",
 )
 
 go_repository(
