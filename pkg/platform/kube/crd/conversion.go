@@ -20,17 +20,17 @@ import (
 
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"istio.io/broker/pkg/model"
+	"istio.io/broker/pkg/model/config"
 )
 
-func convertObject(schema model.ProtoSchema, object IstioObject) (*model.Config, error) {
+func convertObject(schema config.Schema, object IstioObject) (*config.Entry, error) {
 	data, err := schema.FromJSONMap(object.GetSpec())
 	if err != nil {
 		return nil, err
 	}
 	meta := object.GetObjectMeta()
-	return &model.Config{
-		ConfigMeta: model.ConfigMeta{
+	return &config.Entry{
+		Meta: config.Meta{
 			Type:            schema.Type,
 			Name:            meta.Name,
 			Namespace:       meta.Namespace,
@@ -43,18 +43,18 @@ func convertObject(schema model.ProtoSchema, object IstioObject) (*model.Config,
 }
 
 // convertConfig translates Istio config to k8s config JSON
-func convertConfig(schema model.ProtoSchema, config model.Config) (IstioObject, error) {
-	spec, err := schema.ToJSONMap(config.Spec)
+func convertConfig(schema config.Schema, entry config.Entry) (IstioObject, error) {
+	spec, err := schema.ToJSONMap(entry.Spec)
 	if err != nil {
 		return nil, err
 	}
 	out := knownTypes[schema.Type].object.DeepCopyObject().(IstioObject)
 	out.SetObjectMeta(meta_v1.ObjectMeta{
-		Name:            config.Name,
-		Namespace:       config.Namespace,
-		ResourceVersion: config.ResourceVersion,
-		Labels:          config.Labels,
-		Annotations:     config.Annotations,
+		Name:            entry.Name,
+		Namespace:       entry.Namespace,
+		ResourceVersion: entry.ResourceVersion,
+		Labels:          entry.Labels,
+		Annotations:     entry.Annotations,
 	})
 	out.SetSpec(spec)
 

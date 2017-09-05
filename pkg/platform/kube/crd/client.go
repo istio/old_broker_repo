@@ -39,7 +39,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"istio.io/broker/pkg/model"
+	"istio.io/broker/pkg/model/config"
 )
 
 // IstioObject is a k8s wrapper interface for config objects
@@ -59,7 +59,7 @@ type IstioObjectList interface {
 
 // Client is a basic REST client for CRDs implementing config store
 type Client struct {
-	descriptor model.ConfigDescriptor
+	descriptor config.Descriptor
 
 	// restconfig for REST type descriptors
 	restconfig *rest.Config
@@ -91,11 +91,11 @@ func resolveConfig(kubeconfig string) (string, error) {
 }
 
 // CreateRESTConfig for cluster API server, pass empty config file for in-cluster
-func CreateRESTConfig(kubeconfig string) (config *rest.Config, err error) {
+func CreateRESTConfig(kubeconfig string) (restconfig *rest.Config, err error) {
 	if kubeconfig == "" {
-		config, err = rest.InClusterConfig()
+		restconfig, err = rest.InClusterConfig()
 	} else {
-		config, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
+		restconfig, err = clientcmd.BuildConfigFromFlags("", kubeconfig)
 	}
 
 	if err != nil {
@@ -103,13 +103,13 @@ func CreateRESTConfig(kubeconfig string) (config *rest.Config, err error) {
 	}
 
 	version := schema.GroupVersion{
-		Group:   model.IstioAPIGroup,
-		Version: model.IstioAPIVersion,
+		Group:   config.IstioAPIGroup,
+		Version: config.IstioAPIVersion,
 	}
 
-	config.GroupVersion = &version
-	config.APIPath = "/apis"
-	config.ContentType = runtime.ContentTypeJSON
+	restconfig.GroupVersion = &version
+	restconfig.APIPath = "/apis"
+	restconfig.ContentType = runtime.ContentTypeJSON
 
 	types := runtime.NewScheme()
 	schemeBuilder := runtime.NewSchemeBuilder(
@@ -121,7 +121,7 @@ func CreateRESTConfig(kubeconfig string) (config *rest.Config, err error) {
 			return nil
 		})
 	err = schemeBuilder.AddToScheme(types)
-	config.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(types)}
+	restconfig.NegotiatedSerializer = serializer.DirectCodecFactory{CodecFactory: serializer.NewCodecFactory(types)}
 
 	return
 }
@@ -129,7 +129,7 @@ func CreateRESTConfig(kubeconfig string) (config *rest.Config, err error) {
 // NewClient creates a client to Kubernetes API using a kubeconfig file.
 // Use an empty value for `kubeconfig` to use the in-cluster config.
 // If the kubeconfig file is empty, defaults to in-cluster config as well.
-func NewClient(config string, descriptor model.ConfigDescriptor) (*Client, error) {
+func NewClient(config string, descriptor config.Descriptor) (*Client, error) {
 	for _, typ := range descriptor {
 		if _, exists := knownTypes[typ.Type]; !exists {
 			return nil, fmt.Errorf("missing known type for %q", typ.Type)
@@ -168,14 +168,14 @@ func (cl *Client) RegisterResources() error {
 	}
 
 	for _, schema := range cl.descriptor {
-		name := schema.Plural + "." + model.IstioAPIGroup
+		name := schema.Plural + "." + config.IstioAPIGroup
 		crd := &apiextensionsv1beta1.CustomResourceDefinition{
 			ObjectMeta: meta_v1.ObjectMeta{
 				Name: name,
 			},
 			Spec: apiextensionsv1beta1.CustomResourceDefinitionSpec{
-				Group:   model.IstioAPIGroup,
-				Version: model.IstioAPIVersion,
+				Group:   config.IstioAPIGroup,
+				Version: config.IstioAPIVersion,
 				Scope:   apiextensionsv1beta1.NamespaceScoped,
 				Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
 					Plural: schema.Plural,
@@ -194,7 +194,7 @@ func (cl *Client) RegisterResources() error {
 	errPoll := wait.Poll(500*time.Millisecond, 60*time.Second, func() (bool, error) {
 	descriptor:
 		for _, schema := range cl.descriptor {
-			name := schema.Plural + "." + model.IstioAPIGroup
+			name := schema.Plural + "." + config.IstioAPIGroup
 			crd, errGet := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(name, meta_v1.GetOptions{})
 			if errGet != nil {
 				return false, errGet
@@ -238,7 +238,7 @@ func (cl *Client) DeregisterResources() error {
 
 	var errs error
 	for _, schema := range cl.descriptor {
-		name := schema.Plural + "." + model.IstioAPIGroup
+		name := schema.Plural + "." + config.IstioAPIGroup
 		err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Delete(name, nil)
 		errs = multierror.Append(errs, err)
 	}
@@ -246,30 +246,30 @@ func (cl *Client) DeregisterResources() error {
 }
 
 // ConfigDescriptor for the store
-func (cl *Client) ConfigDescriptor() model.ConfigDescriptor {
+func (cl *Client) ConfigDescriptor() config.Descriptor {
 	return cl.descriptor
 }
 
 // Get implements store interface
-func (cl *Client) Get(typ, name, namespace string) (*model.Config, bool) {
+func (cl *Client) Get(typ, name, namespace string) (*config.Entry, bool) {
 	schema, exists := cl.descriptor.GetByType(typ)
 	if !exists {
 		return nil, false
 	}
 
-	config := knownTypes[typ].object.DeepCopyObject().(IstioObject)
+	entry := knownTypes[typ].object.DeepCopyObject().(IstioObject)
 	err := cl.dynamic.Get().
 		Namespace(namespace).
 		Resource(schema.Plural).
 		Name(name).
-		Do().Into(config)
+		Do().Into(entry)
 
 	if err != nil {
 		glog.Warning(err)
 		return nil, false
 	}
 
-	out, err := convertObject(schema, config)
+	out, err := convertObject(schema, entry)
 	if err != nil {
 		glog.Warning(err)
 		return nil, false
@@ -278,17 +278,17 @@ func (cl *Client) Get(typ, name, namespace string) (*model.Config, bool) {
 }
 
 // Create implements store interface
-func (cl *Client) Create(config model.Config) (string, error) {
-	schema, exists := cl.descriptor.GetByType(config.Type)
+func (cl *Client) Create(entry config.Entry) (string, error) {
+	schema, exists := cl.descriptor.GetByType(entry.Type)
 	if !exists {
-		return "", fmt.Errorf("unrecognized type %q", config.Type)
+		return "", fmt.Errorf("unrecognized type %q", entry.Type)
 	}
 
-	if err := schema.Validate(config.Spec); err != nil {
+	if err := schema.Validate(entry.Spec); err != nil {
 		return "", multierror.Prefix(err, "validation error:")
 	}
 
-	out, err := convertConfig(schema, config)
+	out, err := convertConfig(schema, entry)
 	if err != nil {
 		return "", err
 	}
@@ -307,21 +307,21 @@ func (cl *Client) Create(config model.Config) (string, error) {
 }
 
 // Update implements store interface
-func (cl *Client) Update(config model.Config) (string, error) {
-	schema, exists := cl.descriptor.GetByType(config.Type)
+func (cl *Client) Update(entry config.Entry) (string, error) {
+	schema, exists := cl.descriptor.GetByType(entry.Type)
 	if !exists {
-		return "", fmt.Errorf("unrecognized type %q", config.Type)
+		return "", fmt.Errorf("unrecognized type %q", entry.Type)
 	}
 
-	if err := schema.Validate(config.Spec); err != nil {
+	if err := schema.Validate(entry.Spec); err != nil {
 		return "", multierror.Prefix(err, "validation error:")
 	}
 
-	if config.ResourceVersion == "" {
+	if entry.ResourceVersion == "" {
 		return "", fmt.Errorf("revision is required")
 	}
 
-	out, err := convertConfig(schema, config)
+	out, err := convertConfig(schema, entry)
 	if err != nil {
 		return "", err
 	}
@@ -355,7 +355,7 @@ func (cl *Client) Delete(typ, name, namespace string) error {
 }
 
 // List implements store interface
-func (cl *Client) List(typ, namespace string) ([]model.Config, error) {
+func (cl *Client) List(typ, namespace string) ([]config.Entry, error) {
 	schema, exists := cl.descriptor.GetByType(typ)
 	if !exists {
 		return nil, fmt.Errorf("missing type %q", typ)
@@ -367,7 +367,7 @@ func (cl *Client) List(typ, namespace string) ([]model.Config, error) {
 		Resource(schema.Plural).
 		Do().Into(list)
 
-	out := make([]model.Config, 0)
+	out := make([]config.Entry, 0)
 	for _, item := range list.GetItems() {
 		obj, err := convertObject(schema, item)
 		if err != nil {
