@@ -17,21 +17,16 @@ syntax = "proto3";
 // Basic config resource consisting
 // of a set of key-value pairs
 
-package pkg.model.test;
-
-import "gogoproto/gogo.proto";
+package broker.model.test;
 
 option go_package = "test";
-option (gogoproto.goproto_getters_all) = false;
-option (gogoproto.equal_all) = false;
-option (gogoproto.gostring_all) = false;
 
-message MockConfig {
+message FakeConfig {
   string key = 1;
-  repeated ConfigPair pairs = 2;
+  repeated Pair pairs = 2;
 }
 
-message ConfigPair {
+message Pair {
   string key = 1;
   string value = 2;
 }
