@@ -17,9 +17,9 @@ syntax = "proto3";
 // Basic config resource consisting
 // of a set of key-value pairs
 
-package broker.testing.mock;
+package broker.testing;
 
-option go_package = "mock";
+option go_package = "testing";
 
 message FakeConfig {
   string key = 1;

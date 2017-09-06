@@ -24,8 +24,7 @@ import (
 	"github.com/golang/protobuf/proto"
 
 	"istio.io/broker/pkg/model/config"
-	"istio.io/broker/pkg/testing/mock/proto"
-	"istio.io/pilot/test/mock"
+	testproto "istio.io/broker/pkg/testing/mock/proto"
 )
 
 var (
@@ -33,9 +32,9 @@ var (
 	FakeConfig = config.Schema{
 		Type:        "fake-config",
 		Plural:      "fake-configs",
-		MessageName: "test.FakeConfig",
+		MessageName: "broker.testing.FakeConfig",
 		Validate: func(msg proto.Message) error {
-			if msg.(*mock.FakeConfig).Key == "" {
+			if msg.(*testproto.FakeConfig).Key == "" {
 				return errors.New("empty key")
 			}
 			return nil
@@ -61,9 +60,9 @@ func Make(namespace string, i int) config.Entry {
 				"annotationkey": name,
 			},
 		},
-		Spec: &mock.FakeConfig{
+		Spec: &testproto.FakeConfig{
 			Key: name,
-			Pairs: []*mock.ConfigPair{
+			Pairs: []*testproto.Pair{
 				{Key: "key", Value: strconv.Itoa(i)},
 			},
 		},
@@ -120,7 +119,7 @@ func CheckMapInvariant(r config.Store, t *testing.T, namespace string, n int) {
 			Name:            "invalid",
 			ResourceVersion: revs[0],
 		},
-		Spec: &mock.FakeConfig{},
+		Spec: &testproto.FakeConfig{},
 	}
 
 	missing := config.Entry{
@@ -129,7 +128,7 @@ func CheckMapInvariant(r config.Store, t *testing.T, namespace string, n int) {
 			Name:            "missing",
 			ResourceVersion: revs[0],
 		},
-		Spec: &mock.FakeConfig{Key: "missing"},
+		Spec: &testproto.FakeConfig{Key: "missing"},
 	}
 
 	if _, err := r.Create(invalid); err == nil {
@@ -192,7 +191,7 @@ func CheckMapInvariant(r config.Store, t *testing.T, namespace string, n int) {
 	// update all elements
 	for i := 0; i < n; i++ {
 		elt := Make(namespace, i)
-		elt.Spec.(*mock.FakeConfig).Pairs[0].Value += "(updated)"
+		elt.Spec.(*testproto.FakeConfig).Pairs[0].Value += "(updated)"
 		elt.ResourceVersion = revs[i]
 		elts[i] = elt
 		if _, err = r.Update(elt); err != nil {
