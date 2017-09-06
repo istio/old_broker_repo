@@ -40,7 +40,7 @@ func CreateController() (*Controller, error) {
 }
 
 // Catalog serves catalog request and generate response.
-func (c *Controller) Catalog(w http.ResponseWriter, r *http.Request) {
+func (c *Controller) Catalog(w http.ResponseWriter, _ *http.Request) {
 	glog.Infof("Get Service Broker Catalog...")
 	var catalog osb.Catalog
 
@@ -51,6 +51,7 @@ func (c *Controller) Catalog(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// nolint: unparam
 func writeResponse(w http.ResponseWriter, code int, object interface{}) {
 	data, err := json.Marshal(object)
 	if err != nil {

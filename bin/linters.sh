@@ -53,7 +53,8 @@ go_metalinter() {
         fi
     fi
 
-    # Note: WriteHeaderAndJson excluded because the interface is defined in a 3rd party library.
+    # Exclude test files.
+    # Exclude knownTypes due to generated types.
     gometalinter.v1\
         --concurrency=4\
         --enable-gc\
@@ -67,8 +68,8 @@ go_metalinter() {
         --enable=goconst\
         --enable=gofmt\
         --enable=goimports\
-        --enable=golint --min-confidence=0 --exclude=vendor --exclude=.pb.go --exclude=pkg/config/proto/combined.go --exclude=.*.gen.go --exclude="should have a package comment"\
-        --exclude=".*pkg/config/apiserver_test.go:.* method WriteHeaderAndJson should be WriteHeaderAndJSON"\
+        --enable=golint --min-confidence=0 --exclude=vendor --exclude=.pb.go --exclude=pkg/testing --exclude=.*_test.go --exclude=.*.gen.go --exclude="should have a package comment"\
+        --exclude="pkg/platform/kube/crd/.*knownTypes.*"\
         --enable=ineffassign\
         --enable=interfacer\
         --enable=lll --line-length=160\
@@ -91,7 +92,7 @@ run_linters() {
     echo Running linters
     buildifier -showlog -mode=check $(find . -name BUILD -type f)
     buildifier -showlog -mode=check $(find . -name BUILD.bazel -type f)
-    buildifier -showlog -mode=check ./BUILD.ubuntu
+    buildifier -showlog -mode=check ./BUILD.*
     buildifier -showlog -mode=check ./WORKSPACE
     go_metalinter
     $SCRIPTPATH/check_license.sh

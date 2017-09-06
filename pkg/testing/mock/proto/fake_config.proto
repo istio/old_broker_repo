@@ -14,13 +14,10 @@
 
 syntax = "proto3";
 
-// Basic config resource consisting
+package proto;
+
+// Testing config resource consisting
 // of a set of key-value pairs
-
-package broker.testing;
-
-option go_package = "testing";
-
 message FakeConfig {
   string key = 1;
   repeated Pair pairs = 2;

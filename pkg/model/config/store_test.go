@@ -55,13 +55,13 @@ func TestConfigDescriptor(t *testing.T) {
 
 type testStore struct {
 	ctrl  gomock.Controller
-	mock  *MockStore
+	mock  *MockStore // nolint: errcheck
 	store BrokerConfigStore
 }
 
 func initTestStore(t *testing.T) *testStore {
 	ctrl := gomock.NewController(t)
-	mock := NewMockStore(ctrl)
+	mock := NewMockStore(ctrl) // nolint: errcheck
 	return &testStore{
 		mock:  mock,
 		store: MakeBrokerConfigStore(mock),
@@ -113,6 +113,7 @@ func TestServiceClasses(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
+		// nolint: errcheck
 		r.mock.EXPECT().List(ServiceClass.Type, "").Return(c.mockEntries, c.mockError)
 		if got := r.store.ServiceClasses(); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%v failed: \ngot %+vwant %+v", c.name, spew.Sdump(got), spew.Sdump(c.want))
@@ -161,6 +162,7 @@ func TestServicePlans(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
+		// nolint: errcheck
 		r.mock.EXPECT().List(ServicePlan.Type, "").Return(c.mockEntries, c.mockError)
 		if got := r.store.ServicePlans(); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%v failed: \ngot %+vwant %+v", c.name, spew.Sdump(got), spew.Sdump(c.want))
@@ -221,6 +223,7 @@ func TestServicePlansByService(t *testing.T) {
 		},
 	}
 	for _, c := range cases {
+		// nolint: errcheck
 		r.mock.EXPECT().List(ServicePlan.Type, "").Return(c.mockEntries, c.mockError)
 		if got := r.store.ServicePlansByService(c.input); !reflect.DeepEqual(got, c.want) {
 			t.Errorf("%v failed: \ngot %+vwant %+v", c.name, spew.Sdump(got), spew.Sdump(c.want))

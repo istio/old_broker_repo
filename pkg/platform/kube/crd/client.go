@@ -360,15 +360,14 @@ func (cl *Client) List(typ, namespace string) ([]config.Entry, error) {
 	if !exists {
 		return nil, fmt.Errorf("missing type %q", typ)
 	}
-
-	list := knownTypes[schema.Type].collection.DeepCopyObject().(IstioObjectList)
+	list := knownTypes[schema.Type].collection.DeepCopyObject().(IstioObjectList) // nolint
 	errs := cl.dynamic.Get().
 		Namespace(namespace).
 		Resource(schema.Plural).
 		Do().Into(list)
 
 	out := make([]config.Entry, 0)
-	for _, item := range list.GetItems() {
+	for _, item := range list.GetItems() { // nolint
 		obj, err := convertObject(schema, item)
 		if err != nil {
 			errs = multierror.Append(errs, err)

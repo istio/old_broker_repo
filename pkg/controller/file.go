@@ -20,6 +20,7 @@ import (
 	"os"
 )
 
+// nolint: unparam
 func readAndUnmarshal(object interface{}, dir string, fileName string) error {
 	path := dir + string(os.PathSeparator) + fileName
 

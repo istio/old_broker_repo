@@ -244,70 +244,10 @@ http_file(
 )
 
 go_repository(
-    name = "com_github_prometheus_client_golang",
-    commit = "c5b7fccd204277076155f10851dad72b76a49317",  # Aug 17, 2016 (v0.8.0)
-    importpath = "github.com/prometheus/client_golang",
-)
-
-go_repository(
-    name = "com_github_prometheus_common",
-    commit = "dd2f054febf4a6c00f2343686efb775948a8bff4",  # Jan 8, 2017 (no releases)
-    importpath = "github.com/prometheus/common",
-)
-
-go_repository(
-    name = "com_github_matttproud_golang_protobuf_extensions",
-    commit = "c12348ce28de40eed0136aa2b644d0ee0650e56c",  # Apr 24, 2016 (v1.0.0)
-    importpath = "github.com/matttproud/golang_protobuf_extensions",
-)
-
-go_repository(
-    name = "com_github_prometheus_procfs",
-    commit = "1878d9fbb537119d24b21ca07effd591627cd160",  # Jan 28, 2017 (no releases)
-    importpath = "github.com/prometheus/procfs",
-)
-
-go_repository(
-    name = "com_github_beorn7_perks",
-    commit = "4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9",  # Aug 4, 2016 (no releases)
-    importpath = "github.com/beorn7/perks",
-)
-
-go_repository(
-    name = "com_github_prometheus_client_model",
-    commit = "fa8ad6fec33561be4280a8f0514318c79d7f6cb6",  # Feb 12, 2015 (only release too old)
-    importpath = "github.com/prometheus/client_model",
-)
-
-go_repository(
-    name = "com_github_cactus_statsd_client",
-    commit = "91c326c3f7bd20f0226d3d1c289dd9f8ce28d33d",  # release 3.1.0, 5/30/2016
-    importpath = "github.com/cactus/go-statsd-client",
-)
-
-go_repository(
-    name = "com_github_redis_client",
-    commit = "1ac54a28f5934ea5e08f588647e734aba2383cb8",  # Jan 28, 2017 (no releases)
-    importpath = "github.com/mediocregopher/radix.v2",
-)
-
-go_repository(
-    name = "com_github_mini_redis",
-    commit = "e9169f14d501184b6cc94e270e5a93e4bab203d7",  # release 2.0.0, 4/15/2017
-    importpath = "github.com/alicebob/miniredis",
-)
-
-go_repository(
-    name = "com_github_bsm_redeo",
-    commit = "1ce09fc76693fb3c1ca9b529c66f38920beb6fb8",  # Aug 17, 2016 (no releases)
-    importpath = "github.com/bsm/redeo",
-)
-
-go_repository(
     name = "io_k8s_api",
     build_file_generation = "on",
     build_file_name = "BUILD.bazel",
-    commit = "4d5cc6efc5e84aa19fb1bd3f911c16a6723c1bb7",
+    commit = "4d5cc6efc5e84aa19fb1bd3f911c16a6723c1bb7",  # Jul 18, 2017 (syncwith client_go)
     importpath = "k8s.io/api",
 )
 
@@ -323,33 +263,41 @@ go_repository(
     name = "io_k8s_apimachinery",
     build_file_generation = "on",
     build_file_name = "BUILD.bazel",
-    commit = "6134cb2da6d90597b0434e349f90f94fafc9ae51",
+    commit = "6134cb2da6d90597b0434e349f90f94fafc9ae51",  # Jul 18, 2017 (sync with client_go)
     importpath = "k8s.io/apimachinery",
+)
+
+go_repository(
+    name = "io_k8s_kube_openapi",
+    build_file_generation = "on",
+    build_file_name = "BUILD.bazel",
+    commit = "abfc5fbe1cf87ee697db107fdfd24c32fe4397a8",  # Sept 6, 2017 (no release)
+    importpath = "k8s.io/kube-openapi",
 )
 
 go_repository(
     name = "io_k8s_apiextensions_apiserver",
     build_file_generation = "on",
     build_file_name = "BUILD.bazel",
-    commit = "c682349b0d1c12975d8e24a9799b66747255d7a5",
+    commit = "2bfb07d318ed549813240d1165fcebad6250c666",  # Aug 29, 2017 (no release)
     importpath = "k8s.io/apiextensions-apiserver",
 )
 
 go_repository(
     name = "com_github_googleapis_gnostic",
-    commit = "68f4ded48ba9414dab2ae69b3f0d69971da73aa5",
+    commit = "ee43cbb60db7bd22502942cccbc39059117352ab",  # Sep 5, 2017 (no release)
     importpath = "github.com/googleapis/gnostic",
 )
 
 go_repository(
     name = "com_github_emicklei_go_restful",
-    commit = "ff4f55a206334ef123e4f79bbf348980da81ca46",
+    commit = "68c9750c36bb8cb433f1b88c807b4b30df4acc40",  # Jul 3, 2017  (v2.2.1)
     importpath = "github.com/emicklei/go-restful",
 )
 
 go_repository(
     name = "com_github_emicklei_go_restful_swagger12",
-    commit = "dcef7f55730566d41eae5db10e7d6981829720f6",
+    commit = "dcef7f55730566d41eae5db10e7d6981829720f6",  # Feb 8, 2017 (v1.0.1)
     importpath = "github.com/emicklei/go-restful-swagger12",
 )
 
@@ -528,7 +476,7 @@ go_repository(
 
 go_repository(
     name = "com_github_golang_mock",
-    commit = "bd3c8e81be01eef76d4b503f5e687d2d1354d2d9",
+    commit = "13f360950a79f5864a972c786a10a50e44b69541", # Jul 22, 2017 (v 1.0.0)
     importpath = "github.com/golang/mock",
 )
 

@@ -33,7 +33,7 @@ var (
 	FakeConfig = config.Schema{
 		Type:        "fake-config",
 		Plural:      "fake-configs",
-		MessageName: "broker.testing.FakeConfig",
+		MessageName: "proto.FakeConfig",
 		AdditionalValidate: func(msg proto.Message) error {
 			if msg.(*testproto.FakeConfig).Key == "" {
 				return errors.New("empty key")
