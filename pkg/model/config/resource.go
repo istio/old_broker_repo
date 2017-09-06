@@ -59,7 +59,7 @@ type Meta struct {
 	ResourceVersion string `json:"resourceVersion,omitempty"`
 }
 
-// Config is a configuration unit consisting of the type of configuration, the
+// Entry is a configuration unit consisting of the type of configuration, the
 // key identifier that is unique per type, and the content represented as a
 // protobuf message.
 type Entry struct {

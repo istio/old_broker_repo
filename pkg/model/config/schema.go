@@ -18,13 +18,13 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"regexp"
 
 	"github.com/ghodss/yaml"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	multierror "github.com/hashicorp/go-multierror"
 	yaml2 "gopkg.in/yaml.v2"
-	"regexp"
 )
 
 const (
@@ -161,21 +161,21 @@ func isDNS1123Label(value string) bool {
 
 // Validate the basic config. Invokes AdditionalValidate() if set.
 func (ps *Schema) Validate(config proto.Message) error {
-		if !isDNS1123Label(ps.Type) {
-			return fmt.Errorf("invalid type: %q", ps.Type)
-		}
-		if !isDNS1123Label(ps.Plural) {
-			return fmt.Errorf("invalid plural: %q", ps.Plural)
-		}
-		if proto.MessageType(ps.MessageName) == nil {
-			return fmt.Errorf("cannot discover proto message type: %q", ps.MessageName)
-		}
-  if ps.AdditionalValidate != nil {
-		return ps.AdditionalValidate(config)
-	} else {
-		return nil
+	if !isDNS1123Label(ps.Type) {
+		return fmt.Errorf("invalid type: %q", ps.Type)
 	}
+	if !isDNS1123Label(ps.Plural) {
+		return fmt.Errorf("invalid plural: %q", ps.Plural)
+	}
+	if proto.MessageType(ps.MessageName) == nil {
+		return fmt.Errorf("cannot discover proto message type: %q", ps.MessageName)
+	}
+	if ps.AdditionalValidate != nil {
+		return ps.AdditionalValidate(config)
+	}
+	return nil
 }
+
 // Descriptor defines a group of config types.
 type Descriptor []Schema
 
@@ -271,4 +271,3 @@ func (descriptor Descriptor) ToYAML(config Entry) (string, error) {
 
 	return string(bytes), nil
 }
-

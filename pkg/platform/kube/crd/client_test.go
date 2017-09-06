@@ -19,6 +19,10 @@ import (
 	"os/user"
 	"testing"
 
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
+
 	"istio.io/broker/pkg/model/config"
 	"istio.io/broker/pkg/testing/mock"
 	"istio.io/broker/pkg/testing/util"
@@ -54,6 +58,21 @@ func makeClient(t *testing.T) *Client {
 	}
 
 	return cl
+}
+
+func createInterface(kubeconfig string) (*rest.Config, kubernetes.Interface, error) {
+	kube, err := resolveConfig(kubeconfig)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	config, err := clientcmd.BuildConfigFromFlags("", kube)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	client, err := kubernetes.NewForConfig(config)
+	return config, client, err
 }
 
 // makeTempClient allocates a namespace and cleans it up on test completion

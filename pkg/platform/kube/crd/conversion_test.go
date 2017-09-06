@@ -14,7 +14,10 @@
 
 package crd
 
-import "testing"
+import (
+	"bytes"
+	"testing"
+)
 
 var (
 	camelKabobs = []struct{ in, out string }{
@@ -23,6 +26,22 @@ var (
 		{"ExampleXY", "example-x-y"},
 	}
 )
+
+// camelCaseToKabobCase converts "MyName" to "my-name"
+func camelCaseToKabobCase(s string) string {
+	var out bytes.Buffer
+	for i := range s {
+		if 'A' <= s[i] && s[i] <= 'Z' {
+			if i > 0 {
+				out.WriteByte('-')
+			}
+			out.WriteByte(s[i] - 'A' + 'a')
+		} else {
+			out.WriteByte(s[i])
+		}
+	}
+	return out.String()
+}
 
 func TestCamelKabob(t *testing.T) {
 	for _, tt := range camelKabobs {

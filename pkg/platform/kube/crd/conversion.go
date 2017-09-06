@@ -15,7 +15,6 @@
 package crd
 
 import (
-	"bytes"
 	"strings"
 
 	meta_v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -69,21 +68,4 @@ func kabobCaseToCamelCase(s string) string {
 		out = out + strings.Title(word)
 	}
 	return out
-}
-
-// camelCaseToKabobCase converts "MyName" to "my-name"
-// nolint: deadcode
-func camelCaseToKabobCase(s string) string {
-	var out bytes.Buffer
-	for i := range s {
-		if 'A' <= s[i] && s[i] <= 'Z' {
-			if i > 0 {
-				out.WriteByte('-')
-			}
-			out.WriteByte(s[i] - 'A' + 'a')
-		} else {
-			out.WriteByte(s[i])
-		}
-	}
-	return out.String()
 }

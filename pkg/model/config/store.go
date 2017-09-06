@@ -22,7 +22,7 @@ import (
 	brokerconfig "istio.io/api/broker/v1/config"
 )
 
-// ConfigStore describes a set of platform agnostic APIs that must be supported
+// Store describes a set of platform agnostic APIs that must be supported
 // by the underlying platform to store and retrieve Istio configuration.
 //
 // Configuration key is defined to be a combination of the type, name, and
@@ -87,7 +87,6 @@ func Key(typ, name, namespace string) string {
 func (entry *Entry) Key() string {
 	return Key(entry.Type, entry.Name, entry.Namespace)
 }
-
 
 // BrokerConfigStore is a specialized interface to access config store using
 // Broker configuration types.
