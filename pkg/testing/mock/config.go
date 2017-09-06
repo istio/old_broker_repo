@@ -21,6 +21,7 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/protobuf/proto"
 
 	brokerconfig "istio.io/api/broker/v1/config"
@@ -228,46 +229,54 @@ func CheckMapInvariant(r config.Store, t *testing.T, namespace string, n int) {
 func CheckBrokerConfigTypes(store config.Store, namespace string, t *testing.T) {
 	name := "example"
 
-	sc := &brokerconfig.ServiceClass{
-		Deployment: &brokerconfig.Deployment{
-			Instance: "productpage",
+	cases := []config.Entry{
+		{
+			Meta: config.Meta{
+				Type:      config.ServiceClass.Type,
+				Name:      name,
+				Namespace: namespace,
+			},
+			Spec: &brokerconfig.ServiceClass{
+				Deployment: &brokerconfig.Deployment{
+					Instance: "productpage",
+				},
+				Entry: &brokerconfig.CatalogEntry{
+					Name:        "istio-bookinfo-productpage",
+					Id:          "4395a443-f49a-41b0-8d14-d17294cf612f",
+					Description: "A book info service",
+				},
+			},
 		},
-		Entry: &brokerconfig.CatalogEntry{
-			Name:        "istio-bookinfo-productpage",
-			Id:          "4395a443-f49a-41b0-8d14-d17294cf612f",
-			Description: "A book info service",
+		{
+			Meta: config.Meta{
+				Type:      config.ServicePlan.Type,
+				Name:      name,
+				Namespace: namespace,
+			},
+			Spec: &brokerconfig.ServicePlan{
+				Plan: &brokerconfig.CatalogPlan{
+					Name:        "istio-monthly",
+					Id:          "58646b26-867a-4954-a1b9-233dac07815b",
+					Description: "monthly subscription",
+				},
+				Services: []string{
+					"productpage-service-class",
+				},
+			},
 		},
 	}
 
-	sp := &brokerconfig.ServicePlan{
-		Plan: &brokerconfig.CatalogPlan{
-			Name:        "istio-monthly",
-			Id:          "58646b26-867a-4954-a1b9-233dac07815b",
-			Description: "monthly subscription",
-		},
-		Services: []string{
-			"productpage-service-class",
-		},
-	}
-
-	if _, err := store.Create(config.Entry{
-		Meta: config.Meta{
-			Type:      config.ServiceClass.Type,
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: sc,
-	}); err != nil {
-		t.Errorf("Create(ServiceClass) => got %v", err)
-	}
-	if _, err := store.Create(config.Entry{
-		Meta: config.Meta{
-			Type:      config.ServicePlan.Type,
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: sp,
-	}); err != nil {
-		t.Errorf("Create(ServicePlan) => got %v", err)
+	for _, c := range cases {
+		typ := c.Meta.Type
+		if _, err := store.Create(c); err != nil {
+			t.Errorf("Create(%s) => got %v", typ, err)
+		}
+		got, ok := store.Get(typ, name, namespace)
+		if !ok {
+			t.Errorf("Get(%s) => not found", typ)
+		}
+		if !reflect.DeepEqual(got.Spec, c.Spec) {
+			t.Errorf("Get(%s): got %+vwant %+v", typ, spew.Sdump(got), spew.Sdump(c))
+		}
 	}
 }
