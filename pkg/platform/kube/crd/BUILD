@@ -1,4 +1,4 @@
-load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
     name = "go_default_library",
@@ -34,4 +34,19 @@ genrule(
     outs = ["types.go"],
     cmd = "pkg/platform/kube/crd/generate.sh > $@",
     tools = ["generate.sh"],
+)
+
+go_test(
+    name = "go_default_test",
+    srcs = [
+        "client_test.go",
+        "conversion_test.go",
+    ],
+    library = ":go_default_library",
+    deps = [
+        "//pkg/model/config:go_default_library",
+        "//pkg/testing/mock:go_default_library",
+        "//pkg/testing/util:go_default_library",
+        "@io_istio_pilot//platform/kube:go_default_library",
+    ],
 )

@@ -12,21 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-syntax = "proto3";
+package crd
 
-// Basic config resource consisting
-// of a set of key-value pairs
+import "testing"
 
-package broker.model.test;
+var (
+	camelKabobs = []struct{ in, out string }{
+		{"ExampleNameX", "example-name-x"},
+		{"Example1", "example1"},
+		{"ExampleXY", "example-x-y"},
+	}
+)
 
-option go_package = "test";
-
-message FakeConfig {
-  string key = 1;
-  repeated Pair pairs = 2;
-}
-
-message Pair {
-  string key = 1;
-  string value = 2;
+func TestCamelKabob(t *testing.T) {
+	for _, tt := range camelKabobs {
+		s := camelCaseToKabobCase(tt.in)
+		if s != tt.out {
+			t.Errorf("camelCaseToKabobCase(%q) => %q, want %q", tt.in, s, tt.out)
+		}
+		u := kabobCaseToCamelCase(tt.out)
+		if u != tt.in {
+			t.Errorf("kabobToCamel(%q) => %q, want %q", tt.out, u, tt.in)
+		}
+	}
 }
