@@ -35,6 +35,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 
 	"istio.io/broker/pkg/model/config"
+	"istio.io/broker/pkg/testing/mock"
 )
 
 var knownTypes = map[string]struct {
@@ -60,11 +61,28 @@ EOF
 
 done
 
+TEST="FakeConfig"
+
+for crd in $TEST; do
+cat << EOF
+	mock.$crd.Type: {
+		object: &${crd}{
+			TypeMeta: meta_v1.TypeMeta{
+				Kind:       "${crd}",
+				APIVersion: config.IstioAPIVersion,
+			},
+		},
+		collection: &${crd}List{},
+	},
+EOF
+
+done
+
 cat <<EOF
 }
 EOF
 
-for crd in $CRDS; do
+for crd in $CRDS $TEST; do
   sed -e "1,22d;s/IstioKind/$crd/g" pkg/platform/kube/crd/template.go
 done
 

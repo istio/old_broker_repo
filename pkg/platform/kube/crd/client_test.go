@@ -22,7 +22,6 @@ import (
 	"istio.io/broker/pkg/model/config"
 	"istio.io/broker/pkg/testing/mock"
 	"istio.io/broker/pkg/testing/util"
-	"istio.io/pilot/platform/kube"
 )
 
 func kubeconfig(t *testing.T) string {
@@ -59,7 +58,7 @@ func makeClient(t *testing.T) *Client {
 
 // makeTempClient allocates a namespace and cleans it up on test completion
 func makeTempClient(t *testing.T) (*Client, string, func()) {
-	_, client, err := kube.CreateInterface(kubeconfig(t))
+	_, client, err := createInterface(kubeconfig(t))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -78,10 +77,4 @@ func TestStoreInvariant(t *testing.T) {
 	client, ns, cleanup := makeTempClient(t)
 	defer cleanup()
 	mock.CheckMapInvariant(client, t, ns, 5)
-}
-
-func TestIstioConfig(t *testing.T) {
-	client, ns, cleanup := makeTempClient(t)
-	defer cleanup()
-	mock.CheckIstioConfigTypes(client, ns, t)
 }

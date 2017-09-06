@@ -11,6 +11,7 @@ go_library(
     visibility = ["//visibility:public"],
     deps = [
         "//pkg/model/config:go_default_library",
+        "//pkg/testing/mock:go_default_library",
         "@com_github_golang_glog//:go_default_library",
         "@com_github_hashicorp_go_multierror//:go_default_library",
         "@io_k8s_apiextensions_apiserver//pkg/apis/apiextensions/v1beta1:go_default_library",
@@ -21,6 +22,7 @@ go_library(
         "@io_k8s_apimachinery//pkg/runtime/schema:go_default_library",
         "@io_k8s_apimachinery//pkg/runtime/serializer:go_default_library",
         "@io_k8s_apimachinery//pkg/util/wait:go_default_library",
+        "@io_k8s_client_go//kubernetes:go_default_library",
         "@io_k8s_client_go//plugin/pkg/client/auth/gcp:go_default_library",
         "@io_k8s_client_go//plugin/pkg/client/auth/oidc:go_default_library",
         "@io_k8s_client_go//rest:go_default_library",
@@ -47,6 +49,5 @@ go_test(
         "//pkg/model/config:go_default_library",
         "//pkg/testing/mock:go_default_library",
         "//pkg/testing/util:go_default_library",
-        "@io_istio_pilot//platform/kube:go_default_library",
     ],
 )

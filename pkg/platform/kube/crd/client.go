@@ -30,6 +30,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/runtime/serializer"
 	"k8s.io/apimachinery/pkg/util/wait"
+	"k8s.io/client-go/kubernetes"
 	// import GKE cluster authentication plugin
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 	// import OIDC cluster authentication plugin, e.g. for Tectonic
@@ -88,6 +89,21 @@ func resolveConfig(kubeconfig string) (string, error) {
 		}
 	}
 	return kubeconfig, nil
+}
+
+func createInterface(kubeconfig string) (*rest.Config, kubernetes.Interface, error) {
+	kube, err := resolveConfig(kubeconfig)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	config, err := clientcmd.BuildConfigFromFlags("", kube)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	client, err := kubernetes.NewForConfig(config)
+	return config, client, err
 }
 
 // CreateRESTConfig for cluster API server, pass empty config file for in-cluster
@@ -245,8 +261,8 @@ func (cl *Client) DeregisterResources() error {
 	return errs
 }
 
-// ConfigDescriptor for the store
-func (cl *Client) ConfigDescriptor() config.Descriptor {
+// Descriptor for the store
+func (cl *Client) Descriptor() config.Descriptor {
 	return cl.descriptor
 }
 
