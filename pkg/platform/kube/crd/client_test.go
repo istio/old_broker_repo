@@ -78,3 +78,9 @@ func TestStoreInvariant(t *testing.T) {
 	defer cleanup()
 	mock.CheckMapInvariant(client, t, ns, 5)
 }
+
+func TestBrokerConfig(t *testing.T) {
+	client, ns, cleanup := makeTempClient(t)
+	defer cleanup()
+	mock.CheckBrokerConfigTypes(client, ns, t)
+}

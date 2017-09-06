@@ -56,7 +56,7 @@ type Store interface {
 	Descriptor() Descriptor
 
 	// Get retrieves a configuration element by a type and a key
-	Get(typ, name, namespace string) (config *Entry, exists bool)
+	Get(typ, name, namespace string) (entry *Entry, exists bool)
 
 	// List returns objects by type and namespace.
 	// Use "" for the namespace to list across namespaces.
@@ -65,14 +65,14 @@ type Store interface {
 	// Create adds a new configuration object to the store. If an object with the
 	// same name and namespace for the type already exists, the operation fails
 	// with no side effects.
-	Create(config Entry) (revision string, err error)
+	Create(entry Entry) (revision string, err error)
 
 	// Update modifies an existing configuration object in the store.  Update
 	// requires that the object has been created.  Resource version prevents
 	// overriding a value that has been changed between prior _Get_ and _Put_
 	// operation to achieve optimistic concurrency. This method returns a new
 	// revision if the operation succeeds.
-	Update(config Entry) (newRevision string, err error)
+	Update(entry Entry) (newRevision string, err error)
 
 	// Delete removes an object from the store by key
 	Delete(typ, name, namespace string) error
@@ -88,38 +88,6 @@ func (entry *Entry) Key() string {
 	return Key(entry.Type, entry.Name, entry.Namespace)
 }
 
-// Descriptor defines the bijection between the short type name and its
-// fully qualified protobuf message name
-type Descriptor []Schema
-
-// Types lists all known types in the config schema
-func (descriptor Descriptor) Types() []string {
-	types := make([]string, 0, len(descriptor))
-	for _, t := range descriptor {
-		types = append(types, t.Type)
-	}
-	return types
-}
-
-// GetByMessageName finds a schema by message name if it is available
-func (descriptor Descriptor) GetByMessageName(name string) (Schema, bool) {
-	for _, schema := range descriptor {
-		if schema.MessageName == name {
-			return schema, true
-		}
-	}
-	return Schema{}, false
-}
-
-// GetByType finds a schema by type if it is available
-func (descriptor Descriptor) GetByType(name string) (Schema, bool) {
-	for _, schema := range descriptor {
-		if schema.Type == name {
-			return schema, true
-		}
-	}
-	return Schema{}, false
-}
 
 // BrokerConfigStore is a specialized interface to access config store using
 // Broker configuration types.
@@ -148,7 +116,6 @@ var (
 		Type:        "service-class",
 		Plural:      "service-classes",
 		MessageName: "istio.broker.v1.config.ServiceClass",
-		Validate:    nil,
 	}
 
 	// ServicePlan describes service plan
@@ -156,7 +123,6 @@ var (
 		Type:        "service-plan",
 		Plural:      "service-plans",
 		MessageName: "istio.broker.v1.config.ServicePlan",
-		Validate:    nil,
 	}
 
 	// BrokerConfigTypes lists all types with schemas and validation

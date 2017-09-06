@@ -24,6 +24,16 @@ import (
 	"github.com/golang/protobuf/proto"
 	multierror "github.com/hashicorp/go-multierror"
 	yaml2 "gopkg.in/yaml.v2"
+	"regexp"
+)
+
+const (
+	dns1123LabelMaxLength int    = 63
+	dns1123LabelFmt       string = "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
+)
+
+var (
+	dns1123LabelRex = regexp.MustCompile("^" + dns1123LabelFmt + "$")
 )
 
 // Schema provides description of the configuration schema and its key function
@@ -37,9 +47,9 @@ type Schema struct {
 	// MessageName refers to the protobuf message type name corresponding to the type
 	MessageName string
 
-	// Validate configuration as a protobuf message assuming the object is an
-	// instance of the expected message type
-	Validate func(config proto.Message) error
+	// AdditionalValidate the protobuf message for this type. This is called within schema.Validate()
+	// This can be nil.
+	AdditionalValidate func(config proto.Message) error
 }
 
 // Make creates a new instance of the proto message
@@ -143,6 +153,61 @@ func (ps *Schema) FromJSONMap(data interface{}) (proto.Message, error) {
 	return out, nil
 }
 
+// isDNS1123Label tests for a string that conforms to the definition of a label in
+// DNS (RFC 1123).
+func isDNS1123Label(value string) bool {
+	return len(value) <= dns1123LabelMaxLength && dns1123LabelRex.MatchString(value)
+}
+
+// Validate the basic config. Invokes AdditionalValidate() if set.
+func (ps *Schema) Validate(config proto.Message) error {
+		if !isDNS1123Label(ps.Type) {
+			return fmt.Errorf("invalid type: %q", ps.Type)
+		}
+		if !isDNS1123Label(ps.Plural) {
+			return fmt.Errorf("invalid plural: %q", ps.Plural)
+		}
+		if proto.MessageType(ps.MessageName) == nil {
+			return fmt.Errorf("cannot discover proto message type: %q", ps.MessageName)
+		}
+  if ps.AdditionalValidate != nil {
+		return ps.AdditionalValidate(config)
+	} else {
+		return nil
+	}
+}
+// Descriptor defines a group of config types.
+type Descriptor []Schema
+
+// Types lists all known types in the config schema
+func (descriptor Descriptor) Types() []string {
+	types := make([]string, 0, len(descriptor))
+	for _, t := range descriptor {
+		types = append(types, t.Type)
+	}
+	return types
+}
+
+// GetByMessageName finds a schema by message name if it is available
+func (descriptor Descriptor) GetByMessageName(name string) (Schema, bool) {
+	for _, schema := range descriptor {
+		if schema.MessageName == name {
+			return schema, true
+		}
+	}
+	return Schema{}, false
+}
+
+// GetByType finds a schema by type if it is available
+func (descriptor Descriptor) GetByType(name string) (Schema, bool) {
+	for _, schema := range descriptor {
+		if schema.Type == name {
+			return schema, true
+		}
+	}
+	return Schema{}, false
+}
+
 // JSONConfig is the JSON serialized form of the config unit
 type JSONConfig struct {
 	Meta
@@ -206,3 +271,4 @@ func (descriptor Descriptor) ToYAML(config Entry) (string, error) {
 
 	return string(bytes), nil
 }
+

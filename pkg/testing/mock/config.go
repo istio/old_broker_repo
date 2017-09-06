@@ -25,6 +25,7 @@ import (
 
 	"istio.io/broker/pkg/model/config"
 	testproto "istio.io/broker/pkg/testing/mock/proto"
+	brokerconfig "istio.io/api/broker/v1/config"
 )
 
 var (
@@ -33,7 +34,7 @@ var (
 		Type:        "fake-config",
 		Plural:      "fake-configs",
 		MessageName: "broker.testing.FakeConfig",
-		Validate: func(msg proto.Message) error {
+		AdditionalValidate: func(msg proto.Message) error {
 			if msg.(*testproto.FakeConfig).Key == "" {
 				return errors.New("empty key")
 			}
@@ -220,5 +221,53 @@ func CheckMapInvariant(r config.Store, t *testing.T, namespace string, n int) {
 	}
 	if len(l) != 0 {
 		t.Errorf("wanted 0 element(s), got %d in %v", len(l), l)
+	}
+}
+
+// CheckBrokerConfigTypes validates that an empty store can ingest Istio config objects
+func CheckBrokerConfigTypes(store config.Store, namespace string, t *testing.T) {
+	name := "example"
+
+	sc := &brokerconfig.ServiceClass{
+		Deployment: &brokerconfig.Deployment{
+			Instance: "productpage",
+		},
+		Entry: &brokerconfig.CatalogEntry{
+			Name:        "istio-bookinfo-productpage",
+			Id:          "4395a443-f49a-41b0-8d14-d17294cf612f",
+			Description: "A book info service",
+		},
+	}
+
+	sp := &brokerconfig.ServicePlan{
+		Plan: &brokerconfig.CatalogPlan{
+			Name:        "istio-monthly",
+			Id:          "58646b26-867a-4954-a1b9-233dac07815b",
+			Description: "monthly subscription",
+		},
+		Services: []string{
+			"productpage-service-class",
+		},
+	}
+
+	if _, err := store.Create(config.Entry{
+		Meta: config.Meta{
+			Type:      config.ServiceClass.Type,
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: sc,
+	}); err != nil {
+		t.Errorf("Create(ServiceClass) => got %v", err)
+	}
+	if _, err := store.Create(config.Entry{
+		Meta: config.Meta{
+			Type:      config.ServicePlan.Type,
+			Name:      name,
+			Namespace: namespace,
+		},
+		Spec: sp,
+	}); err != nil {
+		t.Errorf("Create(ServicePlan) => got %v", err)
 	}
 }

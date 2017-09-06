@@ -185,7 +185,7 @@ func (cl *Client) RegisterResources() error {
 
 	for _, schema := range cl.descriptor {
 		name := schema.Plural + "." + config.IstioAPIGroup
-		crd := &apiextensionsv1beta1.CustomResourceDefinition{
+		rd := &apiextensionsv1beta1.CustomResourceDefinition{
 			ObjectMeta: meta_v1.ObjectMeta{
 				Name: name,
 			},
@@ -194,13 +194,14 @@ func (cl *Client) RegisterResources() error {
 				Version: config.IstioAPIVersion,
 				Scope:   apiextensionsv1beta1.NamespaceScoped,
 				Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
+					Singular: schema.Type,
 					Plural: schema.Plural,
 					Kind:   kabobCaseToCamelCase(schema.Type),
 				},
 			},
 		}
-		glog.V(2).Infof("registering CRD %q", name)
-		_, err = clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Create(crd)
+		glog.V(2).Infof("registering CRD %q", rd)
+		_, err = clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Create(rd)
 		if err != nil && !apierrors.IsAlreadyExists(err) {
 			return err
 		}
@@ -211,11 +212,11 @@ func (cl *Client) RegisterResources() error {
 	descriptor:
 		for _, schema := range cl.descriptor {
 			name := schema.Plural + "." + config.IstioAPIGroup
-			crd, errGet := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(name, meta_v1.GetOptions{})
+			rd, errGet := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(name, meta_v1.GetOptions{})
 			if errGet != nil {
 				return false, errGet
 			}
-			for _, cond := range crd.Status.Conditions {
+			for _, cond := range rd.Status.Conditions {
 				switch cond.Type {
 				case apiextensionsv1beta1.Established:
 					if cond.Status == apiextensionsv1beta1.ConditionTrue {

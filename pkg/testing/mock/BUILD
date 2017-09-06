@@ -8,5 +8,6 @@ go_library(
         "//pkg/model/config:go_default_library",
         "//pkg/testing/mock/proto:go_default_library",
         "@com_github_golang_protobuf//proto:go_default_library",
+        "@io_istio_api//:go_default_library",
     ],
 )
