@@ -42,9 +42,6 @@ var (
 			return nil
 		},
 	}
-
-	// Types defines the fake config descriptor
-	Types = config.Descriptor{FakeConfig}
 )
 
 // Make creates a fake config indexed by a number

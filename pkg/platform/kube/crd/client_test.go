@@ -23,7 +23,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"istio.io/broker/pkg/model/config"
 	"istio.io/broker/pkg/testing/mock"
 	"istio.io/broker/pkg/testing/util"
 )
@@ -33,20 +32,22 @@ func kubeconfig(t *testing.T) string {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
+	f := usr.HomeDir + "/.kube/config"
 
-	kubeconfig := usr.HomeDir + "/.kube/config"
-
-	// For Bazel sandbox we search a different location:
-	if _, err = os.Stat(kubeconfig); err != nil {
-		kubeconfig, _ = os.Getwd()
-		kubeconfig = kubeconfig + "/../../../platform/kube/config"
+	// For Bazel sandbox, the config is mounted in a different location
+	// as specified in prow/broker-presubmit.sh
+	if _, err = os.Stat(f); err != nil {
+		wd, _ := os.Getwd()
+		f = wd + "/../config"
 	}
 
-	return kubeconfig
+	return f
 }
 
 func makeClient(t *testing.T) *Client {
-	desc := append(config.BrokerConfigTypes, mock.Types...)
+	desc := BrokerConfigTypes
+	_ := append(BrokerConfigTypes.schemas, configSchema{
+		mock.FakeConfig})
 	cl, err := NewClient(kubeconfig(t), desc)
 	if err != nil {
 		t.Fatal(err)

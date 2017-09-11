@@ -34,6 +34,9 @@ if [ "${CI:-}" == 'bootstrap' ]; then
 
     # Use the provided pull head sha, from prow.
     GIT_SHA="${PULL_PULL_SHA}"
+
+    # Use volume mount from broker-presubmit job's pod spec.
+    ln -sf "${HOME}/.kube/config" pkg/platform/kube/config
 else
     # Use the current commit.
     GIT_SHA="$(git rev-parse --verify HEAD)"

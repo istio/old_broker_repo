@@ -50,10 +50,40 @@ type IstioObject interface {
 	SetObjectMeta(meta_v1.ObjectMeta)
 }
 
+// configSchema is the k8s crd specific schema.
+type configSchema struct {
+  config.Schema
+}
+
+// resourceNames creates the k8s crd resource names from the schema.
+// Returns Kind, Singular name, Plural name, and CRD resource name.
+func (s *configSchema) resourceNames() (string, string, string, string) {
+	p := resourceName(s.Plural)
+	return kabobCaseToCamelCase(s.Type), resourceName(s.Type), p,
+		p + "." + config.IstioAPIGroup
+}
+
+type configDescriptor struct {
+	config.Descriptor
+	schemas []configSchema
+}
+
 // IstioObjectList is a k8s wrapper interface for config lists
 type IstioObjectList interface {
 	runtime.Object
 	GetItems() []IstioObject
+}
+
+// BrokerConfigTypes lists all types with schemas and validation
+var BrokerConfigTypes = configDescriptor{
+	schemas : []configSchema{
+		{
+			config.ServiceClass,
+		},
+		{
+			config.ServicePlan,
+		},
+	},
 }
 
 // Client is a basic REST client for CRDs implementing config store
@@ -128,8 +158,8 @@ func CreateRESTConfig(kubeconfig string) (restconfig *rest.Config, err error) {
 // NewClient creates a client to Kubernetes API using a kubeconfig file.
 // Use an empty value for `kubeconfig` to use the in-cluster config.
 // If the kubeconfig file is empty, defaults to in-cluster config as well.
-func NewClient(config string, descriptor config.Descriptor) (*Client, error) {
-	for _, typ := range descriptor {
+func NewClient(config string, descriptor configDescriptor) (*Client, error) {
+	for _, typ := range descriptor.schemas {
 		if _, exists := knownTypes[typ.Type]; !exists {
 			return nil, fmt.Errorf("missing known type for %q", typ.Type)
 		}
@@ -166,8 +196,8 @@ func (cl *Client) RegisterResources() error {
 		return err
 	}
 
-	for _, schema := range cl.descriptor {
-		name := schema.Plural + "." + config.IstioAPIGroup
+	for _, schema := range cl.descriptor.schemas {
+		k, s, p, name := schema.resourceNames()
 		rd := &apiextensionsv1beta1.CustomResourceDefinition{
 			ObjectMeta: meta_v1.ObjectMeta{
 				Name: name,
@@ -177,9 +207,9 @@ func (cl *Client) RegisterResources() error {
 				Version: config.IstioAPIVersion,
 				Scope:   apiextensionsv1beta1.NamespaceScoped,
 				Names: apiextensionsv1beta1.CustomResourceDefinitionNames{
-					Singular: schema.Type,
-					Plural:   schema.Plural,
-					Kind:     kabobCaseToCamelCase(schema.Type),
+					Singular: s,
+					Plural:   p,
+					Kind:     k,
 				},
 			},
 		}
@@ -193,8 +223,8 @@ func (cl *Client) RegisterResources() error {
 	// wait for CRD being established
 	errPoll := wait.Poll(500*time.Millisecond, 60*time.Second, func() (bool, error) {
 	descriptor:
-		for _, schema := range cl.descriptor {
-			name := schema.Plural + "." + config.IstioAPIGroup
+		for _, schema := range cl.descriptor.schemas {
+			_, _, _, name := schema.resourceNames()
 			rd, errGet := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(name, meta_v1.GetOptions{})
 			if errGet != nil {
 				return false, errGet
@@ -237,8 +267,8 @@ func (cl *Client) DeregisterResources() error {
 	}
 
 	var errs error
-	for _, schema := range cl.descriptor {
-		name := schema.Plural + "." + config.IstioAPIGroup
+	for _, schema := range cl.descriptor.schemas {
+		_, _, _, name := schema.resourceNames()
 		err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Delete(name, nil)
 		errs = multierror.Append(errs, err)
 	}
@@ -246,7 +276,7 @@ func (cl *Client) DeregisterResources() error {
 }
 
 // Descriptor for the store
-func (cl *Client) Descriptor() config.Descriptor {
+func (cl *Client) Descriptor() configDescriptor {
 	return cl.descriptor
 }
 
