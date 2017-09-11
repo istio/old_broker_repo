@@ -23,7 +23,6 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"istio.io/broker/pkg/model/config"
 	"istio.io/broker/pkg/testing/mock"
 	"istio.io/broker/pkg/testing/util"
 )
@@ -46,7 +45,9 @@ func kubeconfig(t *testing.T) string {
 }
 
 func makeClient(t *testing.T) *Client {
-	desc := append(config.BrokerConfigTypes, mock.Types...)
+	desc := BrokerConfigTypes
+	_ := append(BrokerConfigTypes.schemas, configSchema{
+		mock.FakeConfig})
 	cl, err := NewClient(kubeconfig(t), desc)
 	if err != nil {
 		t.Fatal(err)

@@ -176,39 +176,6 @@ func (ps *Schema) Validate(config proto.Message) error {
 	return nil
 }
 
-// Descriptor defines a group of config types.
-type Descriptor []Schema
-
-// Types lists all known types in the config schema
-func (descriptor Descriptor) Types() []string {
-	types := make([]string, 0, len(descriptor))
-	for _, t := range descriptor {
-		types = append(types, t.Type)
-	}
-	return types
-}
-
-// GetByMessageName finds a schema by message name if it is available
-func (descriptor Descriptor) GetByMessageName(name string) (Schema, bool) {
-	for _, schema := range descriptor {
-		if schema.MessageName == name {
-			return schema, true
-		}
-	}
-	return Schema{}, false
-}
-
-// GetByType finds a schema by type if it is available
-func (descriptor Descriptor) GetByType(name string) (Schema, bool) {
-	for _, schema := range descriptor {
-		if schema.Type == name {
-			return schema, true
-		}
-	}
-	return Schema{}, false
-}
-
-// JSONConfig is the JSON serialized form of the config unit
 type JSONConfig struct {
 	Meta
 
@@ -216,58 +183,23 @@ type JSONConfig struct {
 	Spec interface{} `json:"spec,omitempty"`
 }
 
-// FromJSON deserializes and validates a JSON config object
-func (descriptor Descriptor) FromJSON(config JSONConfig) (*Entry, error) {
-	schema, ok := descriptor.GetByType(config.Type)
-	if !ok {
-		return nil, fmt.Errorf("unknown spec type %s", config.Type)
-	}
+// Descriptor defines a group of config types.
+type Descriptor interface {
+	// Types lists all known types in the config schema
+	Types() []string
 
-	message, err := schema.FromJSONMap(config.Spec)
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse proto message: %v", err)
-	}
+	// GetByMessageName finds a schema by message name if it is available
+	GetByMessageName(name string) (Schema, bool)
 
-	if err = schema.Validate(message); err != nil {
-		return nil, err
-	}
-	return &Entry{
-		Meta: config.Meta,
-		Spec: message,
-	}, nil
-}
+	// GetByType finds a schema by type if it is available
+	GetByType(name string) (Schema, bool)
 
-// FromYAML deserializes and validates a YAML config object
-func (descriptor Descriptor) FromYAML(content []byte) (*Entry, error) {
-	out := JSONConfig{}
-	err := yaml.Unmarshal(content, &out)
-	if err != nil {
-		return nil, err
-	}
-	return descriptor.FromJSON(out)
-}
+	// FromJSON deserializes and validates a JSON config object
+	FromJSON(config JSONConfig) (*Entry, error)
 
-// ToYAML serializes a config into a YAML form
-func (descriptor Descriptor) ToYAML(config Entry) (string, error) {
-	schema, exists := descriptor.GetByType(config.Type)
-	if !exists {
-		return "", fmt.Errorf("missing type %q", config.Type)
-	}
+	// FromYAML deserializes and validates a YAML config object
+	FromYAML(content []byte) (*Entry, error)
 
-	spec, err := schema.ToJSONMap(config.Spec)
-	if err != nil {
-		return "", err
-	}
-
-	out := JSONConfig{
-		Meta: config.Meta,
-		Spec: spec,
-	}
-
-	bytes, err := yaml.Marshal(out)
-	if err != nil {
-		return "", err
-	}
-
-	return string(bytes), nil
+	// ToYAML serializes a config into a YAML form
+	ToYAML(config Entry) (string, error)
 }

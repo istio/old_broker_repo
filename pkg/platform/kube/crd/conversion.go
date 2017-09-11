@@ -60,6 +60,12 @@ func convertConfig(schema config.Schema, entry config.Entry) (IstioObject, error
 	return out, nil
 }
 
+// ResourceName converts "my-name" to "myname".
+// This is needed by k8s API server as dashes prevent kubectl from accessing CRDs
+func resourceName(s string) string {
+	return strings.Replace(s, "-", "", -1)
+}
+
 // kabobCaseToCamelCase converts "my-name" to "MyName"
 func kabobCaseToCamelCase(s string) string {
 	words := strings.Split(s, "-")

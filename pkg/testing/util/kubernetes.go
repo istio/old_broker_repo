@@ -36,7 +36,7 @@ const (
 func CreateNamespace(cl kubernetes.Interface) (string, error) {
 	ns, err := cl.CoreV1().Namespaces().Create(&v1.Namespace{
 		ObjectMeta: meta_v1.ObjectMeta{
-			GenerateName: "broker-test-",
+			GenerateName: "istio-test-",
 		},
 	})
 	if err != nil {
