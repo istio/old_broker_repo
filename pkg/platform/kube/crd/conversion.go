@@ -22,6 +22,7 @@ import (
 	"istio.io/broker/pkg/model/config"
 )
 
+// convertObject translates k8s config JSON to Broker config
 func convertObject(schema config.Schema, object IstioObject) (*config.Entry, error) {
 	data, err := schema.FromJSONMap(object.GetSpec())
 	if err != nil {
@@ -41,7 +42,7 @@ func convertObject(schema config.Schema, object IstioObject) (*config.Entry, err
 	}, nil
 }
 
-// convertConfig translates Istio config to k8s config JSON
+// convertConfig translates Broker config to k8s config JSON
 func convertConfig(schema config.Schema, entry config.Entry) (IstioObject, error) {
 	spec, err := schema.ToJSONMap(entry.Spec)
 	if err != nil {

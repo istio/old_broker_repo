@@ -46,7 +46,7 @@ var (
 
 // Make creates a fake config indexed by a number
 func Make(namespace string, i int) config.Entry {
-	name := fmt.Sprintf("%s%d", "mock-config", i)
+	name := fmt.Sprintf("%s%d", "fake-config", i)
 	return config.Entry{
 		Meta: config.Meta{
 			Type:      FakeConfig.Type,

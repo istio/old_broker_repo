@@ -123,6 +123,12 @@ var (
 		Plural:      "service-plans",
 		MessageName: "istio.broker.v1.config.ServicePlan",
 	}
+
+	// BrokerConfigTypes lists all types with schemas and validation
+	BrokerConfigTypes = Descriptor{
+		ServiceClass,
+		ServicePlan,
+	}
 )
 
 // brokerConfigStore provides a simple adapter for Broker configuration types

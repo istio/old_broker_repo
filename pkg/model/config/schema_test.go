@@ -56,18 +56,18 @@ func TestProtoSchemaConversions(t *testing.T) {
 	}
 
 	badSchema := &Schema{MessageName: "bad-name"}
-	if _, err := badSchema.FromYAML(wantYAML); err == nil {
+	if _, err := badSchema.fromYAML(wantYAML); err == nil {
 		t.Errorf("FromYAML should have failed using ProtoSchema with bad MessageName")
 	}
 
-	gotYAML, err := s.ToYAML(msg)
+	gotYAML, err := s.toYAML(msg)
 	if err != nil {
 		t.Errorf("ToYAML failed: %v", err)
 	}
 	if !reflect.DeepEqual(gotYAML, wantYAML) {
 		t.Errorf("ToYAML failed: got %+v want %+v", spew.Sdump(gotYAML), spew.Sdump(wantYAML))
 	}
-	gotFromYAML, err := s.FromYAML(wantYAML)
+	gotFromYAML, err := s.fromYAML(wantYAML)
 	if err != nil {
 		t.Errorf("FromYAML failed: %v", err)
 	}
@@ -88,5 +88,33 @@ func TestProtoSchemaConversions(t *testing.T) {
 	}
 	if !reflect.DeepEqual(gotFromJSONMap, msg) {
 		t.Errorf("FromJSONMap failed: got %+v want %+v", spew.Sdump(gotFromJSONMap), spew.Sdump(msg))
+	}
+}
+
+func TestConfigDescriptor(t *testing.T) {
+	a := Schema{Type: "a", MessageName: "proxy.A"}
+	descriptor := Descriptor{
+		a,
+		Schema{Type: "b", MessageName: "proxy.B"},
+		Schema{Type: "c", MessageName: "proxy.C"},
+	}
+	want := []string{"a", "b", "c"}
+	got := descriptor.Types()
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("descriptor.Types() => got %+vwant %+v", spew.Sdump(got), spew.Sdump(want))
+	}
+
+	aType, aExists := descriptor.GetByType(a.Type)
+	if !aExists || !reflect.DeepEqual(aType, a) {
+		t.Errorf("descriptor.GetByType(a) => got %+v, want %+v", aType, a)
+	}
+
+	aSchema, aSchemaExists := descriptor.GetByMessageName(a.MessageName)
+	if !aSchemaExists || !reflect.DeepEqual(aSchema, a) {
+		t.Errorf("descriptor.GetByMessageName(a) => got %+v, want %+v", aType, a)
+	}
+	_, aSchemaNotExist := descriptor.GetByMessageName("blah")
+	if aSchemaNotExist {
+		t.Errorf("descriptor.GetByMessageName(blah) => got true, want false")
 	}
 }

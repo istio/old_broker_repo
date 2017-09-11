@@ -52,17 +52,17 @@ type Schema struct {
 	AdditionalValidate func(config proto.Message) error
 }
 
-// Make creates a new instance of the proto message
-func (ps *Schema) Make() (proto.Message, error) {
-	pbt := proto.MessageType(ps.MessageName)
+// make creates a new instance of the proto message
+func (b *Schema) make() (proto.Message, error) {
+	pbt := proto.MessageType(b.MessageName)
 	if pbt == nil {
-		return nil, fmt.Errorf("unknown type %q", ps.MessageName)
+		return nil, fmt.Errorf("unknown type %q", b.MessageName)
 	}
 	return reflect.New(pbt.Elem()).Interface().(proto.Message), nil
 }
 
-// ToJSON marshals a proto to canonical JSON
-func (ps *Schema) ToJSON(msg proto.Message) (string, error) {
+// toJSON marshals a proto to canonical JSON
+func (b *Schema) toJSON(msg proto.Message) (string, error) {
 	// Marshal from proto to json bytes
 	m := jsonpb.Marshaler{}
 	out, err := m.MarshalToString(msg)
@@ -72,9 +72,9 @@ func (ps *Schema) ToJSON(msg proto.Message) (string, error) {
 	return out, nil
 }
 
-// ToYAML marshals a proto to canonical YAML
-func (ps *Schema) ToYAML(msg proto.Message) (string, error) {
-	js, err := ps.ToJSON(msg)
+// toYAML marshals a proto to canonical YAML
+func (b *Schema) toYAML(msg proto.Message) (string, error) {
+	js, err := b.toJSON(msg)
 	if err != nil {
 		return "", err
 	}
@@ -84,8 +84,8 @@ func (ps *Schema) ToYAML(msg proto.Message) (string, error) {
 
 // ToJSONMap converts a proto message to a generic map using canonical JSON encoding
 // JSON encoding is specified here: https://developers.google.com/protocol-buffers/docs/proto3#json
-func (ps *Schema) ToJSONMap(msg proto.Message) (map[string]interface{}, error) {
-	js, err := ps.ToJSON(msg)
+func (b *Schema) ToJSONMap(msg proto.Message) (map[string]interface{}, error) {
+	js, err := b.toJSON(msg)
 	if err != nil {
 		return nil, err
 	}
@@ -100,53 +100,53 @@ func (ps *Schema) ToJSONMap(msg proto.Message) (map[string]interface{}, error) {
 	return data, nil
 }
 
-// FromJSON converts a canonical JSON to a proto message
-func (ps *Schema) FromJSON(js string) (proto.Message, error) {
-	pb, err := ps.Make()
+// fromJSON converts a canonical JSON to a proto message
+func (b *Schema) fromJSON(js string) (proto.Message, error) {
+	pb, err := b.make()
 	if err != nil {
 		return nil, err
 	}
-	if err = ApplyJSON(js, pb); err != nil {
+	if err = applyJSON(js, pb); err != nil {
 		return nil, err
 	}
 	return pb, nil
 }
 
-// ApplyJSON unmarshals a JSON string into a proto message
-func ApplyJSON(js string, pb proto.Message) error {
+// applyJSON unmarshals a JSON string into a proto message
+func applyJSON(js string, pb proto.Message) error {
 	return jsonpb.UnmarshalString(js, pb)
 }
 
-// FromYAML converts a canonical YAML to a proto message
-func (ps *Schema) FromYAML(yml string) (proto.Message, error) {
-	pb, err := ps.Make()
+// fromYAML converts a canonical YAML to a proto message
+func (b *Schema) fromYAML(yml string) (proto.Message, error) {
+	pb, err := b.make()
 	if err != nil {
 		return nil, err
 	}
-	if err = ApplyYAML(yml, pb); err != nil {
+	if err = applyYAML(yml, pb); err != nil {
 		return nil, err
 	}
 	return pb, nil
 }
 
-// ApplyYAML unmarshals a YAML string into a proto message
-func ApplyYAML(yml string, pb proto.Message) error {
+// applyYAML unmarshals a YAML string into a proto message
+func applyYAML(yml string, pb proto.Message) error {
 	js, err := yaml.YAMLToJSON([]byte(yml))
 	if err != nil {
 		return err
 	}
-	return ApplyJSON(string(js), pb)
+	return applyJSON(string(js), pb)
 }
 
 // FromJSONMap converts from a generic map to a proto message using canonical JSON encoding
 // JSON encoding is specified here: https://developers.google.com/protocol-buffers/docs/proto3#json
-func (ps *Schema) FromJSONMap(data interface{}) (proto.Message, error) {
+func (b *Schema) FromJSONMap(data interface{}) (proto.Message, error) {
 	// Marshal to YAML bytes
 	str, err := yaml2.Marshal(data)
 	if err != nil {
 		return nil, err
 	}
-	out, err := ps.FromYAML(string(str))
+	out, err := b.fromYAML(string(str))
 	if err != nil {
 		return nil, multierror.Prefix(err, fmt.Sprintf("YAML decoding error: %v", string(str)))
 	}
@@ -160,22 +160,23 @@ func isDNS1123Label(value string) bool {
 }
 
 // Validate the basic config. Invokes AdditionalValidate() if set.
-func (ps *Schema) Validate(config proto.Message) error {
-	if !isDNS1123Label(ps.Type) {
-		return fmt.Errorf("invalid type: %q", ps.Type)
+func (b *Schema) Validate(config proto.Message) error {
+	if !isDNS1123Label(b.Type) {
+		return fmt.Errorf("invalid type: %q", b.Type)
 	}
-	if !isDNS1123Label(ps.Plural) {
-		return fmt.Errorf("invalid plural: %q", ps.Plural)
+	if !isDNS1123Label(b.Plural) {
+		return fmt.Errorf("invalid plural: %q", b.Plural)
 	}
-	if proto.MessageType(ps.MessageName) == nil {
-		return fmt.Errorf("cannot discover proto message type: %q", ps.MessageName)
+	if proto.MessageType(b.MessageName) == nil {
+		return fmt.Errorf("cannot discover proto message type: %q", b.MessageName)
 	}
-	if ps.AdditionalValidate != nil {
-		return ps.AdditionalValidate(config)
+	if b.AdditionalValidate != nil {
+		return b.AdditionalValidate(config)
 	}
 	return nil
 }
 
+// JSONConfig is the JSON serialized form of the config unit
 type JSONConfig struct {
 	Meta
 
@@ -184,22 +185,89 @@ type JSONConfig struct {
 }
 
 // Descriptor defines a group of config types.
-type Descriptor interface {
-	// Types lists all known types in the config schema
-	Types() []string
+type Descriptor []Schema
 
-	// GetByMessageName finds a schema by message name if it is available
-	GetByMessageName(name string) (Schema, bool)
+// Types lists all known types in the config schema
+func (d Descriptor) Types() []string {
+	ts := make([]string, 0, len(d))
+	for _, t := range d {
+		ts = append(ts, t.Type)
+	}
+	return ts
+}
 
-	// GetByType finds a schema by type if it is available
-	GetByType(name string) (Schema, bool)
+// GetByMessageName finds a schema by message name if it is available
+func (d Descriptor) GetByMessageName(name string) (Schema, bool) {
+	for _, s := range d {
+		if s.MessageName == name {
+			return s, true
+		}
+	}
+	return Schema{}, false
+}
 
-	// FromJSON deserializes and validates a JSON config object
-	FromJSON(config JSONConfig) (*Entry, error)
+// GetByType finds a schema by type if it is available
+func (d Descriptor) GetByType(name string) (Schema, bool) {
+	for _, s := range d {
+		if s.Type == name {
+			return s, true
+		}
+	}
+	return Schema{}, false
+}
 
-	// FromYAML deserializes and validates a YAML config object
-	FromYAML(content []byte) (*Entry, error)
+// FromJSON deserializes and validates a JSON config object
+func (d Descriptor) FromJSON(json JSONConfig) (*Entry, error) {
+	s, ok := d.GetByType(json.Type)
+	if !ok {
+		return nil, fmt.Errorf("unknown spec type %s", json.Type)
+	}
 
-	// ToYAML serializes a config into a YAML form
-	ToYAML(config Entry) (string, error)
+	m, err := s.FromJSONMap(json.Spec)
+	if err != nil {
+		return nil, fmt.Errorf("cannot parse proto message: %v", err)
+	}
+
+	if err = s.Validate(m); err != nil {
+		return nil, err
+	}
+	return &Entry{
+		Meta: json.Meta,
+		Spec: m,
+	}, nil
+}
+
+// FromYAML deserializes and validates a YAML config object
+func (d Descriptor) FromYAML(content []byte) (*Entry, error) {
+	out := JSONConfig{}
+	err := yaml.Unmarshal(content, &out)
+	if err != nil {
+		return nil, err
+	}
+	return d.FromJSON(out)
+}
+
+// ToYAML serializes a config into a YAML form
+func (d Descriptor) ToYAML(entry Entry) (string, error) {
+	s, ok := d.GetByType(entry.Type)
+	if !ok {
+		return "", fmt.Errorf("missing type %q", entry.Type)
+	}
+
+	spec, err := s.ToJSONMap(entry.Spec)
+	if err != nil {
+		return "", err
+	}
+
+	out := JSONConfig{
+		Meta: entry.Meta,
+		Spec: spec,
+	}
+
+	bytes, err := yaml.Marshal(out)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
 }

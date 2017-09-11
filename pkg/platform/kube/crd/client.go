@@ -14,6 +14,7 @@
 
 // Package crd provides an implementation of the config store and cache
 // using Kubernetes Custom Resources and the informer framework from Kubernetes
+// This implementation is adopted from github.com/istio/pilot/adapter/config/crd/
 package crd
 
 import (
@@ -50,40 +51,18 @@ type IstioObject interface {
 	SetObjectMeta(meta_v1.ObjectMeta)
 }
 
-// configSchema is the k8s crd specific schema.
-type configSchema struct {
-  config.Schema
-}
-
-// resourceNames creates the k8s crd resource names from the schema.
-// Returns Kind, Singular name, Plural name, and CRD resource name.
-func (s *configSchema) resourceNames() (string, string, string, string) {
-	p := resourceName(s.Plural)
-	return kabobCaseToCamelCase(s.Type), resourceName(s.Type), p,
-		p + "." + config.IstioAPIGroup
-}
-
-type configDescriptor struct {
-	config.Descriptor
-	schemas []configSchema
-}
-
 // IstioObjectList is a k8s wrapper interface for config lists
 type IstioObjectList interface {
 	runtime.Object
 	GetItems() []IstioObject
 }
 
-// BrokerConfigTypes lists all types with schemas and validation
-var BrokerConfigTypes = configDescriptor{
-	schemas : []configSchema{
-		{
-			config.ServiceClass,
-		},
-		{
-			config.ServicePlan,
-		},
-	},
+// resourceNames creates the k8s crd resource names from the schema.
+// Returns Kind, Singular name, Plural name, and CRD resource name.
+func resourceNames(s config.Schema) (string, string, string, string) {
+	p := resourceName(s.Plural)
+	return kabobCaseToCamelCase(s.Type), resourceName(s.Type), p,
+		p + "." + config.IstioAPIGroup
 }
 
 // Client is a basic REST client for CRDs implementing config store
@@ -158,8 +137,8 @@ func CreateRESTConfig(kubeconfig string) (restconfig *rest.Config, err error) {
 // NewClient creates a client to Kubernetes API using a kubeconfig file.
 // Use an empty value for `kubeconfig` to use the in-cluster config.
 // If the kubeconfig file is empty, defaults to in-cluster config as well.
-func NewClient(config string, descriptor configDescriptor) (*Client, error) {
-	for _, typ := range descriptor.schemas {
+func NewClient(config string, descriptor config.Descriptor) (*Client, error) {
+	for _, typ := range descriptor {
 		if _, exists := knownTypes[typ.Type]; !exists {
 			return nil, fmt.Errorf("missing known type for %q", typ.Type)
 		}
@@ -196,8 +175,8 @@ func (cl *Client) RegisterResources() error {
 		return err
 	}
 
-	for _, schema := range cl.descriptor.schemas {
-		k, s, p, name := schema.resourceNames()
+	for _, schema := range cl.descriptor {
+		k, s, p, name := resourceNames(schema)
 		rd := &apiextensionsv1beta1.CustomResourceDefinition{
 			ObjectMeta: meta_v1.ObjectMeta{
 				Name: name,
@@ -223,8 +202,8 @@ func (cl *Client) RegisterResources() error {
 	// wait for CRD being established
 	errPoll := wait.Poll(500*time.Millisecond, 60*time.Second, func() (bool, error) {
 	descriptor:
-		for _, schema := range cl.descriptor.schemas {
-			_, _, _, name := schema.resourceNames()
+		for _, schema := range cl.descriptor {
+			_, _, _, name := resourceNames(schema)
 			rd, errGet := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Get(name, meta_v1.GetOptions{})
 			if errGet != nil {
 				return false, errGet
@@ -267,8 +246,8 @@ func (cl *Client) DeregisterResources() error {
 	}
 
 	var errs error
-	for _, schema := range cl.descriptor.schemas {
-		_, _, _, name := schema.resourceNames()
+	for _, schema := range cl.descriptor {
+		_, _, _, name := resourceNames(schema)
 		err := clientset.ApiextensionsV1beta1().CustomResourceDefinitions().Delete(name, nil)
 		errs = multierror.Append(errs, err)
 	}
@@ -276,7 +255,7 @@ func (cl *Client) DeregisterResources() error {
 }
 
 // Descriptor for the store
-func (cl *Client) Descriptor() configDescriptor {
+func (cl *Client) Descriptor() config.Descriptor {
 	return cl.descriptor
 }
 
@@ -286,11 +265,12 @@ func (cl *Client) Get(typ, name, namespace string) (*config.Entry, bool) {
 	if !exists {
 		return nil, false
 	}
+	_, _, p, _ := resourceNames(schema)
 
 	entry := knownTypes[typ].object.DeepCopyObject().(IstioObject)
 	err := cl.dynamic.Get().
 		Namespace(namespace).
-		Resource(schema.Plural).
+		Resource(p).
 		Name(name).
 		Do().Into(entry)
 
@@ -323,10 +303,11 @@ func (cl *Client) Create(entry config.Entry) (string, error) {
 		return "", err
 	}
 
+	_, _, p, _ := resourceNames(schema)
 	obj := knownTypes[schema.Type].object.DeepCopyObject().(IstioObject)
 	err = cl.dynamic.Post().
 		Namespace(out.GetObjectMeta().Namespace).
-		Resource(schema.Plural).
+		Resource(p).
 		Body(out).
 		Do().Into(obj)
 	if err != nil {
@@ -356,10 +337,11 @@ func (cl *Client) Update(entry config.Entry) (string, error) {
 		return "", err
 	}
 
+	_, _, p, _ := resourceNames(schema)
 	obj := knownTypes[schema.Type].object.DeepCopyObject().(IstioObject)
 	err = cl.dynamic.Put().
 		Namespace(out.GetObjectMeta().Namespace).
-		Resource(schema.Plural).
+		Resource(p).
 		Name(out.GetObjectMeta().Name).
 		Body(out).
 		Do().Into(obj)
@@ -377,9 +359,10 @@ func (cl *Client) Delete(typ, name, namespace string) error {
 		return fmt.Errorf("missing type %q", typ)
 	}
 
+	_, _, p, _ := resourceNames(schema)
 	return cl.dynamic.Delete().
 		Namespace(namespace).
-		Resource(schema.Plural).
+		Resource(p).
 		Name(name).
 		Do().Error()
 }
@@ -391,9 +374,10 @@ func (cl *Client) List(typ, namespace string) ([]config.Entry, error) {
 		return nil, fmt.Errorf("missing type %q", typ)
 	}
 	list := knownTypes[schema.Type].collection.DeepCopyObject().(IstioObjectList) // nolint
+	_, _, p, _ := resourceNames(schema)
 	errs := cl.dynamic.Get().
 		Namespace(namespace).
-		Resource(schema.Plural).
+		Resource(p).
 		Do().Into(list)
 
 	out := make([]config.Entry, 0)
