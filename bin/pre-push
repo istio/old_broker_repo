@@ -30,4 +30,3 @@ fi
 
 make test
 make lint
-make racetest

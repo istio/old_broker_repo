@@ -47,7 +47,6 @@ make build
 
 echo "=== Bazel Tests ==="
 make test
-make racetest
 
 echo "=== Code Check ==="
 export LAST_GOOD_GITSHA="${PULL_BASE_SHA}"
