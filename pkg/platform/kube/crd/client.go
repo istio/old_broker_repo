@@ -217,12 +217,12 @@ func (cl *Client) RegisterResources() error {
 					}
 				case apiextensionsv1beta1.NamesAccepted:
 					if cond.Status == apiextensionsv1beta1.ConditionFalse {
-						glog.Warningf("name conflict: %v", cond.Reason)
+						errGet = multierror.Append(errGet, fmt.Errorf("name conflict: %v", cond.Reason))
 					}
 				}
 			}
-			glog.V(2).Infof("missing status condition for %q", name)
-			return false, err
+			errGet = multierror.Append(errGet, fmt.Errorf("missing status condition for %q", name))
+			return false, errGet
 		}
 		return true, nil
 	})
