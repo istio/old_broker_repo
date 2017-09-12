@@ -26,7 +26,7 @@ git_repository(
 
 git_repository(
     name = "com_github_google_protobuf",
-    commit = "52ab3b07ac9a6889ed0ac9bf21afd8dab8ef0014",  # Oct 4, 2016 (match pubref dep)
+    commit = "593e917c176b5bc5aafa57bf9f6030d749d91cd5", # Feb 17 (v3.2.0)
     remote = "https://github.com/google/protobuf.git",
 )
 
