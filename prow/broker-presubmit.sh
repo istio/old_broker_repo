@@ -43,17 +43,18 @@ else
 fi
 
 echo "=== Bazel Build ==="
-bazel build //...
+make build
 
 echo "=== Bazel Tests ==="
-bazel test --features=race  --test_arg=--logtostderr --test_arg=--v=3 --test_arg=-test.v=true --test_output=all //...
+make test
+make racetest
 
 echo "=== Code Check ==="
 export LAST_GOOD_GITSHA="${PULL_BASE_SHA}"
-./bin/linters.sh
+make lint
 
 echo "=== Code Coverage ==="
-./bin/codecov.sh | tee codecov.report
+make coverage | tee codecov.report
 if [ "${CI:-}" == "bootstrap" ]; then
     BUILD_ID="PROW-${BUILD_NUMBER}" JOB_NAME="broker/presubmit" ./bin/toolbox/presubmit/pkg_coverage.sh
 

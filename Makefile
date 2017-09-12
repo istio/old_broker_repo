@@ -19,7 +19,7 @@ clean:
 	@bazel clean
 
 test:
-	@bazel test --test_arg=--alsologtostderr --test_arg=--v=3 //...
+	@bazel test --features=race  --test_arg=--logtostderr --test_arg=--v=3 --test_arg=-test.v=true --test_output=all //...
 
 lint: build
 	@bin/linters.sh
