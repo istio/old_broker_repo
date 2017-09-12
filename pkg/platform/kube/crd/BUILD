@@ -1,3 +1,5 @@
+package(default_visibility = ["//pkg/platform/kube/crd:__subpackages__"])
+
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 
 go_library(
@@ -8,7 +10,6 @@ go_library(
         "template.go",
         "types.go",
     ],
-    visibility = ["//visibility:public"],
     deps = [
         "//pkg/model/config:go_default_library",
         "//pkg/testing/mock:go_default_library",

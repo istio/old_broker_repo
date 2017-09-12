@@ -19,7 +19,7 @@ clean:
 	@bazel clean
 
 test:
-	@bazel test //...
+	@bazel test --test_arg=--alsologtostderr --test_arg=--v=3 //...
 
 lint: build
 	@bin/linters.sh

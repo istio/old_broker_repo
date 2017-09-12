@@ -1,3 +1,5 @@
+package(default_visibility = ["//pkg:__subpackages__"])
+
 load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
@@ -9,5 +11,4 @@ go_library(
         "serviceInstance.go",
         "servicePlan.go",
     ],
-    visibility = ["//visibility:public"],
 )
