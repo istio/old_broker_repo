@@ -29,3 +29,4 @@ fmt:
 
 coverage:
 	@bin/codecov.sh
+

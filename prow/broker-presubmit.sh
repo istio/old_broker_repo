@@ -49,8 +49,8 @@ echo "=== Bazel Tests ==="
 make test
 
 echo "=== Code Check ==="
-export LAST_GOOD_GITSHA="${PULL_BASE_SHA}"
-make lint
+export LAST_GOOD_GITSHA="${PULL_PULL_SHA}"
+./bin/linters.sh
 
 echo "=== Code Coverage ==="
 make coverage | tee codecov.report

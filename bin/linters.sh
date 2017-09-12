@@ -55,7 +55,7 @@ go_metalinter() {
 
     # Exclude test files.
     # Exclude knownTypes due to generated types.
-    gometalinter.v1\
+    gometalinter\
         --concurrency=4\
         --enable-gc\
         --vendored-linters\
