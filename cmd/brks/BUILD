@@ -6,6 +6,7 @@ go_binary(
     name = "brks",
     library = ":go_default_library",
     linkstamp = "istio.io/broker/pkg/version",
+    visibility = ["//visibility:public"],
 )
 
 go_library(

@@ -48,21 +48,21 @@ make build
 echo "=== Bazel Tests ==="
 make test
 
-echo "=== Code Check ==="
-export LAST_GOOD_GITSHA="${PULL_PULL_SHA}"
 # TODO temporary turn off
+# echo "=== Code Check ==="
+#export LAST_GOOD_GITSHA="${PULL_PULL_SHA}"
 # make lint
 
-echo "=== Code Coverage ==="
-make coverage | tee codecov.report
-if [ "${CI:-}" == "bootstrap" ]; then
-    BUILD_ID="PROW-${BUILD_NUMBER}" JOB_NAME="broker/presubmit" ./bin/toolbox/presubmit/pkg_coverage.sh
-
-    curl -s https://codecov.io/bash | CI_JOB_ID="${JOB_NAME}" CI_BUILD_ID="${BUILD_NUMBER}" bash /dev/stdin \
-      -K -Z -B ${PULL_BASE_REF} -C ${GIT_SHA} -P ${PULL_NUMBER} -t @/etc/codecov/broker.token
-else
-    echo "Not in bootstrap environment, skipping code coverage publishing"
-fi
+#echo "=== Code Coverage ==="
+#make coverage | tee codecov.report
+#if [ "${CI:-}" == "bootstrap" ]; then
+#    BUILD_ID="PROW-${BUILD_NUMBER}" JOB_NAME="broker/presubmit" ./bin/toolbox/presubmit/pkg_coverage.sh
+#
+#    curl -s https://codecov.io/bash | CI_JOB_ID="${JOB_NAME}" CI_BUILD_ID="${BUILD_NUMBER}" bash /dev/stdin \
+#      -K -Z -B ${PULL_BASE_REF} -C ${GIT_SHA} -P ${PULL_NUMBER} -t @/etc/codecov/broker.token
+#else
+#    echo "Not in bootstrap environment, skipping code coverage publishing"
+#fi
 
 echo "=== Publish docker images ==="
 ./bin/publish-docker-images.sh -t ${GIT_SHA} -h 'gcr.io/istio-testing'
