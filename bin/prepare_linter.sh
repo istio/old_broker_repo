@@ -8,8 +8,8 @@ set -ex
 # Ensure expected GOPATH setup
 PDIR=`pwd`
 if [ $PDIR != "${GOPATH-$HOME/go}/src/istio.io/broker" ]; then
-       echo "Broker not found in GOPATH/src/istio.io/"
-       exit 1
+  echo "Broker not found in GOPATH/src/istio.io/"
+  exit 1
 fi
 
 # Building and testing with Bazel
