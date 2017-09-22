@@ -23,6 +23,7 @@ import (
 	"github.com/golang/glog"
 
 	"istio.io/broker/pkg/model/osb"
+	"istio.io/broker/pkg/model/config"
 )
 
 const (
@@ -32,23 +33,33 @@ const (
 
 // Controller data
 type Controller struct {
+	config.BrokerConfigStore
 }
 
 // CreateController creates a new controller instance.
-func CreateController() (*Controller, error) {
-	return new(Controller), nil
+func CreateController(config config.BrokerConfigStore) (*Controller, error) {
+	return &Controller{config}, nil
 }
 
 // Catalog serves catalog request and generate response.
 func (c *Controller) Catalog(w http.ResponseWriter, _ *http.Request) {
 	glog.Infof("Get Service Broker Catalog...")
-	var catalog osb.Catalog
+	catalog := c.catalog()
+	writeResponse(w, http.StatusOK, catalog)
+}
 
-	if err := readAndUnmarshal(&catalog, demoCatalogFilePath, catalogFileName); err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-	} else {
-		writeResponse(w, http.StatusOK, catalog)
+func (c *Controller) catalog() *osb.Catalog {
+	jc := new(osb.Catalog)
+	sc := c.ServiceClasses()
+	for _, s := range sc {
+		js := osb.NewService(s)
+		for _, p := range c.ServicePlansByService(js.Name) {
+			jp := osb.NewServicePlan(p)
+			js.AddPlan(jp)
+		}
+		jc.AddService(js)
 	}
+	return jc
 }
 
 // nolint: unparam

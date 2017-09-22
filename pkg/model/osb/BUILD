@@ -11,4 +11,5 @@ go_library(
         "serviceInstance.go",
         "servicePlan.go",
     ],
+    deps = ["@io_istio_api//broker/v1/config:go_default_library"],
 )

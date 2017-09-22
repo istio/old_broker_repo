@@ -9,6 +9,7 @@ go_library(
         "file.go",
     ],
     deps = [
+        "//pkg/model/config:go_default_library",
         "//pkg/model/osb:go_default_library",
         "@com_github_golang_glog//:go_default_library",
     ],
