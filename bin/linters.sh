@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -x
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 $SCRIPTPATH/install_linters.sh

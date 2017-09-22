@@ -1,7 +1,4 @@
 #!/bin/bash
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
-ROOTDIR=$SCRIPTPATH/..
-cd $ROOTDIR
 
 ret=0
 for fn in $(find cmd pkg -name '*.go'); do
