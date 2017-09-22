@@ -1,4 +1,8 @@
 #!/bin/bash
+
+# This file takes care of linking generated files into the proper path for lint.
+# This is a prerequist to run linters.
+
 set -ex
 
 # Ensure expected GOPATH setup
@@ -22,10 +26,13 @@ rm -rf vendor/k8s.io/*/vendor
 
 # Link proto gen files
 mkdir -p vendor/istio.io/api/broker/v1/config
-for f in service_class.pb.go  service_planpb.go; do
+for f in service_class.pb.go  service_plan.pb.go; do
   ln -sf $(pwd)/bazel-genfiles/external/io_istio_api/broker/v1/config/$f \
     vendor/istio.io/api/broker/v1/config/
 done
+
+ln -sf $(pwd)/bazel-genfiles/pkg/testing/mock/proto/fake_config.pb.go \
+  pkg/testing/mock/proto/
 
 # Link CRD generated files
 ln -sf "$(pwd)/bazel-genfiles/pkg/platform/kube/crd/types.go" \
