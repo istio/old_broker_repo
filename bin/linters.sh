@@ -1,6 +1,10 @@
 #!/bin/bash
 set -ex
 
+SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
+$SCRIPTPATH/install_linters.sh
+$SCRIPTPATH/prepare_linter.sh
+
 buildifier -showlog -mode=check $(find . -type f \( -name 'BUILD' -or -name 'WORKSPACE' -or -wholename '.*bazel$' -or -wholename '.*bzl$' \) -print )
 
 NUM_CPU=$(getconf _NPROCESSORS_ONLN)
@@ -29,11 +33,9 @@ gometalinter --concurrency=${NUM_CPU} --enable-gc --deadline=300s --disable-all\
   --enable=vetshadow\
   --exclude=vendor\
   --exclude=.pb.go\
-  --exclude=pkg/testing\
-  --exclude=.*_test.go\
   --exclude=.*.gen.go\
+  --exclude=.*_test.go\
   --exclude="should have a package comment"\
-  --exclude="pkg/platform/kube/crd/.*knownTypes.*"\
   ./...
 
 # Disabled linters:
@@ -43,7 +45,6 @@ gometalinter --concurrency=${NUM_CPU} --enable-gc --deadline=300s --disable-all\
 
 echo "Done running linters"
 
-SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 $SCRIPTPATH/check_license.sh
 $SCRIPTPATH/check_workspace.sh
 
