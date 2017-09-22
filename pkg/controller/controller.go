@@ -22,13 +22,8 @@ import (
 
 	"github.com/golang/glog"
 
-	"istio.io/broker/pkg/model/osb"
 	"istio.io/broker/pkg/model/config"
-)
-
-const (
-	demoCatalogFilePath = "example"
-	catalogFileName     = "demo_catalog.json"
+	"istio.io/broker/pkg/model/osb"
 )
 
 // Controller data

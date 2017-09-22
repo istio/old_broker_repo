@@ -6,7 +6,6 @@ go_library(
     name = "go_default_library",
     srcs = [
         "controller.go",
-        "file.go",
     ],
     deps = [
         "//pkg/model/config:go_default_library",

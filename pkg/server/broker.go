@@ -23,8 +23,8 @@ import (
 	"github.com/gorilla/mux"
 
 	"istio.io/broker/pkg/controller"
-	"istio.io/broker/pkg/platform/kube/crd"
 	"istio.io/broker/pkg/model/config"
+	"istio.io/broker/pkg/platform/kube/crd"
 )
 
 // Server data

@@ -1,4 +1,4 @@
-package(default_visibility = ["//pkg/platform/kube/crd:__subpackages__"])
+package(default_visibility = ["//pkg/server:__subpackages__"])
 
 load("@io_bazel_rules_go//go:def.bzl", "go_library", "go_test")
 

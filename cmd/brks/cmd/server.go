@@ -22,8 +22,8 @@ import (
 )
 
 type serverArgs struct {
-	port    uint16
-	apiPort uint16
+	port       uint16
+	apiPort    uint16
 	kubeconfig string
 }
 

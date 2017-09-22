@@ -25,7 +25,8 @@ type ServicePlan struct {
 	Free        bool        `json:"free, omitempty"`
 }
 
-func NewServicePlan(sp *brokerconfig.ServicePlan) *ServicePlan{
+// NewServicePlan creates a service plan from service plan config proto.
+func NewServicePlan(sp *brokerconfig.ServicePlan) *ServicePlan {
 	cp := sp.GetPlan()
 	s := new(ServicePlan)
 	s.Name = cp.GetName()

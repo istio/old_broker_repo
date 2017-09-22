@@ -31,10 +31,12 @@ type Service struct {
 	DashboardClient interface{}   `json:"dashboard_client"`
 }
 
+// AddPlan adds a service plan into the service's plans.
 func (s *Service) AddPlan(plan *ServicePlan) {
 	s.Plans = append(s.Plans, *plan)
 }
 
+// NewService creates a service from service class config proto.
 func NewService(sp *brokerconfig.ServiceClass) *Service {
 	s := new(Service)
 	cs := sp.GetEntry()

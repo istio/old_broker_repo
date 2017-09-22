@@ -19,6 +19,7 @@ type Catalog struct {
 	Services []Service `json:"services"`
 }
 
+// AddService adds a service into the catalog services.
 func (c *Catalog) AddService(service *Service) {
 	c.Services = append(c.Services, *service)
 }
