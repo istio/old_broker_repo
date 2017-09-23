@@ -1,14 +1,15 @@
 #!/bin/bash
-set -ex
+set -x
 
 SCRIPTPATH=$( cd "$(dirname "$0")" ; pwd -P )
 $SCRIPTPATH/install_linters.sh
 $SCRIPTPATH/init.sh
 
 buildifier -showlog -mode=check $(find . -type f \( -name 'BUILD' -or -name 'WORKSPACE' -or -wholename '.*bazel$' -or -wholename '.*bzl$' \) -print )
+echo $?
 
-NUM_CPU=4
-# NUM_CPU=$(getconf _NPROCESSORS_ONLN)
+NUM_CPU=$(getconf _NPROCESSORS_ONLN)
+echo $?
 
 echo "Start running linters"
 gometalinter --concurrency=${NUM_CPU} --enable-gc --deadline=300s --disable-all\
@@ -41,6 +42,7 @@ gometalinter --concurrency=${NUM_CPU} --enable-gc --deadline=300s --disable-all\
   --exclude="should have a package comment"\
   ./...
 
+echo $?
 # Disabled linters:
 # --enable=dupl\
 # --enable=gocyclo\
