@@ -15,10 +15,11 @@
 package osb
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 
 	"github.com/davecgh/go-spew/spew"
+
 	brokerconfig "istio.io/api/broker/v1/config"
 )
 
@@ -35,9 +36,9 @@ func TestNewServicePlan(t *testing.T) {
 	}
 	got := NewServicePlan(sp)
 	want := &ServicePlan{
-			Name:        sp.GetPlan().GetName(),
-			ID:          sp.GetPlan().GetId(),
-			Description: sp.GetPlan().GetDescription(),
+		Name:        sp.GetPlan().GetName(),
+		ID:          sp.GetPlan().GetId(),
+		Description: sp.GetPlan().GetDescription(),
 	}
 
 	if !reflect.DeepEqual(got, want) {

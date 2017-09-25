@@ -15,8 +15,8 @@
 package osb
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 
 	"github.com/davecgh/go-spew/spew"
 )

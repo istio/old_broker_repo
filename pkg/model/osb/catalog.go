@@ -14,6 +14,8 @@
 
 package osb
 
+import _ "github.com/golang/glog" // import glog flags
+
 // Catalog defines OSB catalog request data structure.
 type Catalog struct {
 	Services []Service `json:"services"`

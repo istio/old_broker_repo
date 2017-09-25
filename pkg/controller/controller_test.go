@@ -15,13 +15,12 @@
 package controller
 
 import (
+	"reflect"
 	"testing"
 
+	"github.com/davecgh/go-spew/spew"
 	"github.com/golang/mock/gomock"
 
-	"reflect"
-
-	"github.com/davecgh/go-spew/spew"
 	brokerconfig "istio.io/api/broker/v1/config"
 	"istio.io/broker/pkg/model/config"
 	"istio.io/broker/pkg/model/osb"
