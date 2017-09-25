@@ -38,17 +38,20 @@ func CreateController(config config.BrokerConfigStore) (*Controller, error) {
 
 // Catalog serves catalog request and generate response.
 func (c *Controller) Catalog(w http.ResponseWriter, _ *http.Request) {
-	glog.Infof("Get Service Broker Catalog...")
-	catalog := c.catalog()
-	writeResponse(w, http.StatusOK, catalog)
+	glog.Infof("Fetching Service Broker Catalog...")
+	cat := c.catalog()
+	glog.V(2).Infof("Got catalog\n %#v", cat)
+	writeResponse(w, http.StatusOK, cat)
 }
 
 func (c *Controller) catalog() *osb.Catalog {
 	jc := new(osb.Catalog)
 	sc := c.ServiceClasses()
-	for _, s := range sc {
+	for k, s := range sc {
+		glog.V(2).Infof("loading service %q", k)
 		js := osb.NewService(s)
-		for _, p := range c.ServicePlansByService(js.Name) {
+		for pk, p := range c.ServicePlansByService(k) {
+			glog.V(2).Infof("loading service plan %q", pk)
 			jp := osb.NewServicePlan(p)
 			js.AddPlan(jp)
 		}
