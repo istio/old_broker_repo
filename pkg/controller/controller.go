@@ -68,7 +68,7 @@ func writeResponse(w http.ResponseWriter, code int, object interface{}) {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
-
+	w.Header().Set("content-type", "application/json")
 	w.WriteHeader(code)
 	if _, err = fmt.Fprintf(w, string(data)); err != nil {
 		glog.Errorf("Write response data error %s", err.Error())

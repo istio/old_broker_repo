@@ -19,7 +19,11 @@ go_library(
 
 go_test(
     name = "go_default_test",
-    srcs = glob(["*_test.go"]),
+    srcs = [
+        "catalog_test.go",
+        "service_test.go",
+        "serviceplan_test.go",
+    ],
     library = ":go_default_library",
     deps = [
         "@com_github_davecgh_go_spew//spew:go_default_library",
